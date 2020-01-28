@@ -7,6 +7,9 @@ namespace Master_Console.Services
 {
     public static class IOHandlingService
     {
+        public const string BinOrNot = "Shall the items be put into the bin instead of final deletion? Please type 'yes' or 'no'.";
+        public const string FolderDelOrNot = "Please advise, shall we delete the folder itself too, or just the contents? Please type 'yes or 'no'.";
+        private const string _quitString = "quit";
         public static void Introduction()
         {
             ForegroundColor = ConsoleColor.Green;
@@ -27,9 +30,9 @@ namespace Master_Console.Services
             WriteLine("Please provide the full path to the folder with your garbage files. You can just copy-paste it from WinExplorer.");
             var input = ReadLine();
 
-            if (input == "quit")
+            if (input.Equals(_quitString))
             {
-                Environment.Exit(0);
+                Quit();
             }
 
             try
@@ -45,9 +48,9 @@ namespace Master_Console.Services
             return PathInput();
         }
 
-        public static bool BinOrNotInput()
+        public static bool YesOrNoInput(string question)
         {
-            WriteLine("Shall the items be put into the bin instead of final deletion? Please type 'yes' or 'no'.");
+            WriteLine(question);
             var input = ReadLine();
             if (input.Equals("yes"))
             {
@@ -59,8 +62,12 @@ namespace Master_Console.Services
                 Beep();
                 return false;
             }
+            else if (input.Equals(_quitString))
+            {
+                Quit();
+            }
 
-            return BinOrNotInput();
+            return YesOrNoInput(question);
         }
 
         public static TimeSpan LifeSpanInput()
@@ -69,9 +76,9 @@ namespace Master_Console.Services
             var input = ReadLine();
             try
             {
-                if (input == "quit")
+                if (input.Equals(_quitString))
                 {
-                    Environment.Exit(0);
+                    Quit();
                 }
 
                 if (input.All(char.IsDigit))
@@ -97,6 +104,11 @@ namespace Master_Console.Services
             Beep();
             Beep();
             Beep();
+        }
+
+        private static void Quit()
+        {
+            Environment.Exit(0);
         }
     }
 }

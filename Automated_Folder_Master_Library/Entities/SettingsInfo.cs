@@ -9,6 +9,7 @@ namespace Master_Library.Entities
     {
         public string AutoStartPath { get; set; }
         public bool DeleteExes { get; set; }
+        public bool DeleteFolder { get; set; }
         public bool SendToBin { get; set; }
         public TimeSpan GlobalLifeSpan { get; set; }
         public HashSet<PathInfo> Paths { get; set; }

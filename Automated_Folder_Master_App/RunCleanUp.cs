@@ -30,8 +30,8 @@ namespace Master_Console
             _settings.AutoStartPath = string.Empty;
             _settings.DeleteExes = true;
             _settings.Paths = new HashSet<PathInfo>();
-
-            _settings.SendToBin = IOHandlingService.BinOrNotInput();
+            _settings.DeleteFolder = IOHandlingService.YesOrNoInput(IOHandlingService.FolderDelOrNot);
+            _settings.SendToBin = IOHandlingService.YesOrNoInput(IOHandlingService.BinOrNot);
 
             _settings.GlobalLifeSpan = IOHandlingService.LifeSpanInput();
 
@@ -42,6 +42,8 @@ namespace Master_Console
             };
 
             _settings.Paths.Add(path);
+
+            _folders = _settings.Paths?.ToList();
 
             IOHandlingService.SuccessConfirmer();
 
@@ -74,11 +76,13 @@ namespace Master_Console
                 return;
             }
 
+            //TODO, think about directory deletion, if needed or not, can be option too
+
             var timeToDelFolder = lifeSpan < DateTime.Now.Subtract(folderCreationDate);
 
-            if (timeToDelFolder)
+            if (_settings.DeleteFolder && timeToDelFolder)
             {
-                DeleteDirectory(directory);
+                DeleteDirectory(directory, files);
                 return;
             }
 
@@ -104,7 +108,7 @@ namespace Master_Console
             }
         }
 
-        private static void DeleteDirectory(string path)
+        private static void DeleteDirectory(string path, string[] files)
         {
             if (_settings.SendToBin)
             {
@@ -112,6 +116,10 @@ namespace Master_Console
             }
             else
             {
+                for (var i = 0; i < files.Length; i++)
+                {
+                    DeleteFile(files[i]);
+                }
                 Directory.Delete(path);
             }
         }

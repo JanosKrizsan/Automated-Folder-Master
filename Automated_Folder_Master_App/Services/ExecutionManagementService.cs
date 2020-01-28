@@ -25,7 +25,7 @@ namespace Master_Console.Services
                 RunCleanUp.AutomaticSetup();
             }
 
-            //RunCleanUp.DoCleanup();
+            RunCleanUp.DoCleanup();
         }
     }
 }
