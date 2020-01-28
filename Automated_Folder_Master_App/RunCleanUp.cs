@@ -76,7 +76,6 @@ namespace Master_Console
                 return;
             }
 
-            //TODO, think about directory deletion, if needed or not, can be option too
 
             var timeToDelFolder = lifeSpan < DateTime.Now.Subtract(folderCreationDate);
 
