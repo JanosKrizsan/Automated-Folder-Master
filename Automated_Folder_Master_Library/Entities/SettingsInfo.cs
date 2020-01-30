@@ -2,16 +2,24 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Xml.Serialization;
 
 namespace Master_Library.Entities
 {
+    [XmlRoot("SettingsInfo")]
     public struct SettingsInfo
     {
+        [XmlElement("AutoStartPath")]
         public string AutoStartPath { get; set; }
+        [XmlElement("DeleteExes")]
         public bool DeleteExes { get; set; }
+        [XmlElement("DeleteFolder")]
         public bool DeleteFolder { get; set; }
+        [XmlElement("SendToBin")]
         public bool SendToBin { get; set; }
+        [XmlElement("GlobalLifeSpan")]
         public TimeSpan GlobalLifeSpan { get; set; }
+        [XmlArray("Paths"), XmlArrayItem("Path")]
         public HashSet<PathInfo> Paths { get; set; }
     }
 }

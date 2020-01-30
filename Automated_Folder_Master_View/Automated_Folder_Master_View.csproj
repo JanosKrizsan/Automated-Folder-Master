@@ -6,4 +6,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Automated_Folder_Master_Library\Automated_Folder_Master_Library.csproj" />
+  </ItemGroup>
+
 </Project>

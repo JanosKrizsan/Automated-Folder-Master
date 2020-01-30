@@ -10,8 +10,9 @@ namespace Master_Library.Services
     public static class SettingsService
     {
         private static RegistryKey _regKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-        private static SettingsInfo _currentSettings = ReadData();
-        private static readonly string _fileName = "/settings.xml";
+        private static SettingsInfo _currentSettings;
+        private static readonly string _saveFilePath = @"C:\Users\Public\Documents\";
+        private static readonly string _fileName = "settings.xml";
         private static readonly string _appName = "Automated_Folder_Master_Console";
         private static readonly string _appPath = CurrentSettings.AutoStartPath;
 
@@ -66,18 +67,13 @@ namespace Master_Library.Services
             }
         }
 
-        public static void SetSettings(SettingsInfo newInfo)
-        {
-            _currentSettings = newInfo;
-        }
-
         public static dynamic ReadData()
         {
             var serializer = new XmlSerializer(typeof(SettingsInfo));
             dynamic settings = new SettingsInfo();
             try
             {
-                using var stream = new FileStream(_appPath + _fileName, FileMode.Open, FileAccess.Read);
+                using var stream = new FileStream(string.Concat(_saveFilePath, _fileName), FileMode.Open, FileAccess.Read);
                 var reader = new XmlTextReader(stream);
                 settings = (SettingsInfo)serializer.Deserialize(reader);
             }
@@ -90,15 +86,16 @@ namespace Master_Library.Services
 
         public static dynamic SaveData(SettingsInfo info)
         {
-            SetSettings(info);
+            CurrentSettings = info;
             var infoToSave = CurrentSettings;
 
             var serializer = new XmlSerializer(typeof(SettingsInfo));
             try
             {
-                using var stream = new FileStream(_appPath + _fileName, FileMode.Open, FileAccess.Write);
-                var writer = new StreamWriter(_appPath + _fileName);
-                serializer.Serialize(writer, infoToSave);
+                using (var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName)))
+                {
+                    serializer.Serialize(writer, infoToSave);
+                }
             }
             catch(IOException e)
             {
