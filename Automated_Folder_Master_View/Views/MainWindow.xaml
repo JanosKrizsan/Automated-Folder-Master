@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:Master_View.ViewModels"
         xmlns:local="clr-namespace:Master_View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="600">
+        Title="MainWindow" Width="600" Height="600" MinWidth="600" MaxWidth="800" MinHeight="600" MaxHeight="800">
     <Window.DataContext>
         <vm:SettingsViewModel/>
     </Window.DataContext>
@@ -31,25 +31,28 @@
             <Setter Property="Width" Value="80" />
         </Style>
         <Style TargetType="{x:Type ColumnDefinition}">
-            <Setter Property="MinWidth" Value="300"/>
-            <Setter Property="MaxWidth" Value="600"/>
+            <Setter Property="Width" Value="300"/>
         </Style>
         <Style TargetType="{x:Type RowDefinition}">
-            <Setter Property="MinHeight" Value="0"/>
-            <Setter Property="MaxHeight" Value="800"/>
+            <Setter Property="Height" Value="350"/>
         </Style>
+        <Style TargetType="{x:Type ListBox}">
+        </Style>
+        <Style TargetType="{x:Type TreeView}">
+        </Style>
+
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition />
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0">
+        <StackPanel Grid.Row="0">
             <StackPanel Margin="0, 20">
                 <CheckBox IsThreeState="True">Toggle All</CheckBox>
                 <StackPanel Margin="20, 0">
@@ -71,18 +74,21 @@
                     <ComboBox/>
                 </WrapPanel>
             </StackPanel>
-
-
         </StackPanel>
-        <ListBox Height="300" Width="300" Margin="157,130,143,154" Grid.ColumnSpan="3" Grid.Column="1" Grid.RowSpan="2">
-            <ListBoxItem>Path 1 given</ListBoxItem>
-            <ListBoxItem>Path 2 given</ListBoxItem>
-            <ListBoxItem>Path 3 given</ListBoxItem>
-        </ListBox>
-        <TreeView Width="300" Margin="0,10,0,0" Grid.Row="1">
-            <TreeViewItem>item 1</TreeViewItem>
-            <TreeViewItem>item 2</TreeViewItem>
-        </TreeView>
 
+        <StackPanel Grid.Row="1" VerticalAlignment="Top">
+            <Label Content="Paths currently selected:"/>
+            <ListBox>
+                <ListBoxItem Content="Path 1 given"/>
+                <ListBoxItem Content="Path 2 given"/>
+                <ListBoxItem Content="Path 3 given"/>
+            </ListBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Top">
+            <Label Content="Add folders to the selected list:"/>
+            <TreeView Margin="0,10,0,0" Grid.Row="1">
+            </TreeView>
+        </StackPanel>
     </Grid>
 </Window>
