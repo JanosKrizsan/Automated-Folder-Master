@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Master_Library.Entities
 {
-    class Base : INotifyPropertyChanged
+    public class Base : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

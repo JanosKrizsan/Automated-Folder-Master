@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 
 namespace Master_View.Services
@@ -11,11 +9,11 @@ namespace Master_View.Services
         {
 
         }
-        private static class PopupHandler
+        internal static class PopupHandler
         {
-            public static void Popup(Window window, string text, string caption, MessageBoxButton button, MessageBoxImage icon)
+            public static void Popup(string text, string caption, MessageBoxButton button, MessageBoxImage icon)
             {
-                MessageBox.Show(window, text, caption, button, icon);
+                MessageBox.Show(text, caption, button, icon);
             }
         }
     }

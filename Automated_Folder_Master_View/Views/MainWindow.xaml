@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Master_View.ViewModels"
-        xmlns:local="clr-namespace:Master_View"
         mc:Ignorable="d"
         Title="MainWindow" Width="600" Height="600" MinWidth="600" MaxWidth="800" MinHeight="600" MaxHeight="800">
     <Window.DataContext>
@@ -14,7 +13,8 @@
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="Height" Value="20"/>
             <Setter Property="Width" Value="80"/>
-            <Setter Property="Background" Value="LightPink"/>
+            <Setter Property="Background" Value="HotPink"/>
+            <Setter Property="ItemsSource" Value="{Binding LifeSpans}"/>
         </Style>
         <Style TargetType="{x:Type WrapPanel}">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -36,11 +36,11 @@
         <Style TargetType="{x:Type RowDefinition}">
             <Setter Property="Height" Value="350"/>
         </Style>
-        <Style TargetType="{x:Type ListBox}">
+        <Style TargetType="{x:Type ListView}">
+            <Setter Property="ItemsSource" Value="{Binding ObsPaths}"/>
         </Style>
         <Style TargetType="{x:Type TreeView}">
         </Style>
-
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -56,18 +56,18 @@
             <StackPanel Margin="0, 20">
                 <CheckBox IsThreeState="True">Toggle All</CheckBox>
                 <StackPanel Margin="20, 0">
-                    <CheckBox>Autostart Folder Master</CheckBox>
-                    <CheckBox>Include Folders with Apps</CheckBox>
-                    <CheckBox>Delete Folders with Files</CheckBox>
+                    <CheckBox>Autostart On Login</CheckBox>
+                    <CheckBox>Delete Folders With Apps</CheckBox>
+                    <CheckBox>Delete Folders As Well</CheckBox>
                 </StackPanel>
             </StackPanel>
             <StackPanel>
                 <WrapPanel>
-                    <Button Content="Save Settings"/>
-                    <Button Content="Reset Defaults"/>
-                    <Button Content="Clear Paths"/>
-                    <Button Content="Load Settings"/>
-                    <Button Content="Usage Guide"/>
+                    <Button Command="{Binding SaveSettingsCommand}" Content="_Save Settings"/>
+                    <Button Command="{Binding ResetDefaultsCommand}" Content="_Reset Defaults"/>
+                    <Button Command="{Binding ClearPathsCommand}" Content="_Clear Paths"/>
+                    <Button Command="{Binding LoadSettingsCommand}" Content="_Load Settings"/>
+                    <Button Command="{Binding UsageGuideCommand}" Content="_Usage Guide"/>
                 </WrapPanel>
                 <WrapPanel Margin="30">
                     <Label Content="Delete after this many days :"/>
@@ -77,12 +77,14 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Top">
-            <Label Content="Paths currently selected:"/>
-            <ListBox>
-                <ListBoxItem Content="Path 1 given"/>
-                <ListBoxItem Content="Path 2 given"/>
-                <ListBoxItem Content="Path 3 given"/>
-            </ListBox>
+            <Label Content="Paths currently monitored:"/>
+            <ListView>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=Path}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackPanel>
 
         <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Top">

@@ -14,7 +14,8 @@ namespace Master_Library.Services
         private static readonly string _saveFilePath = @"C:\Users\Public\Documents\";
         private static readonly string _fileName = "settings.xml";
         private static readonly string _appName = "Automated_Folder_Master_Console";
-        private static readonly string _appPath = CurrentSettings.AutoStartPath;
+        private static readonly string _appPath = GetExecutingConsoleDirectory();
+
 
         public static SettingsInfo CurrentSettings
         {
@@ -102,6 +103,21 @@ namespace Master_Library.Services
                 return e;
             }
             return true;
+        }
+        private static string GetExecutingConsoleDirectory()
+        {
+            //rework this upon release
+            var parentDir = Directory.GetParent(Directory.GetCurrentDirectory());
+            var targetDirChildren = Directory.GetDirectories(parentDir.FullName);
+
+            foreach (var folder in targetDirChildren)
+            {
+                if (folder.Contains("Automated_Folder_Master_Console"))
+                {
+                    return folder;
+                }
+            }
+            return string.Empty;
         }
     }
 }
