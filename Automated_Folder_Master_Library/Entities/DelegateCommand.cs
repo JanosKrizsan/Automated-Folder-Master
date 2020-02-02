@@ -9,6 +9,10 @@ namespace Master_Library.Entities
         private readonly Action<T> _execute;
         private readonly Predicate<T> _canExecute;
 
+        public DelegateCommand()
+        {
+        }
+
         public DelegateCommand(Action<T> execute)
             : this(execute, null)
         {

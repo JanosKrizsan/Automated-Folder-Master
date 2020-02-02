@@ -15,6 +15,7 @@
             <Setter Property="Width" Value="80"/>
             <Setter Property="Background" Value="HotPink"/>
             <Setter Property="ItemsSource" Value="{Binding LifeSpans}"/>
+            <Setter Property="SelectedItem" Value="{Binding SelectedLifeSpan}"/>
         </Style>
         <Style TargetType="{x:Type WrapPanel}">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -54,11 +55,13 @@
 
         <StackPanel Grid.Row="0">
             <StackPanel Margin="0, 20">
-                <CheckBox IsThreeState="True">Toggle All</CheckBox>
+                <CheckBox IsThreeState="True"  Command="{Binding ToggleAllCommand}" IsChecked="{Binding ToggleAll}">Toggle All</CheckBox>
                 <StackPanel Margin="20, 0">
-                    <CheckBox>Autostart On Login</CheckBox>
-                    <CheckBox>Delete Folders With Apps</CheckBox>
-                    <CheckBox>Delete Folders As Well</CheckBox>
+                    <CheckBox IsChecked="{Binding Autostart}">Autostart On Login</CheckBox>
+                    <CheckBox IsChecked="{Binding DeleteExes}">Delete Folders With Apps</CheckBox>
+                    <CheckBox IsChecked="{Binding DeleteFolder}">Delete Folders As Well</CheckBox>
+                    <CheckBox IsChecked="{Binding SendToBin}">Send Deleted To The Bin</CheckBox>
+                    <CheckBox IsChecked="{Binding SetAllLifeToGlobal}">Set all Lifetimes to Global</CheckBox>
                 </StackPanel>
             </StackPanel>
             <StackPanel>
@@ -71,7 +74,8 @@
                 </WrapPanel>
                 <WrapPanel Margin="30">
                     <Label Content="Delete after this many days :"/>
-                    <ComboBox/>
+                    <ComboBox>
+                    </ComboBox>
                 </WrapPanel>
             </StackPanel>
         </StackPanel>

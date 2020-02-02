@@ -1,6 +1,7 @@
 ﻿using Master_Library.Entities;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
@@ -16,6 +17,15 @@ namespace Master_Library.Services
         private static readonly string _appName = "Automated_Folder_Master_Console";
         private static readonly string _appPath = GetExecutingConsoleDirectory();
 
+        public static SettingsInfo Default { get; } = new SettingsInfo()
+        {
+            Autostart = true,
+            DeleteExes = true,
+            DeleteFolder = false,
+            SendToBin = false,
+            GlobalLifeSpan = TimeSpan.FromDays(30),
+            Paths = new HashSet<PathInfo>()
+        };
 
         public static SettingsInfo CurrentSettings
         {

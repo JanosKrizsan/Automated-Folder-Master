@@ -5,6 +5,7 @@ using Master_View.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
 
 namespace Master_View.ViewModels
 {
@@ -13,28 +14,17 @@ namespace Master_View.ViewModels
         private SettingsInfo _settings = new SettingsInfo();
 
         private ObservableCollection<PathInfo> _paths = new ObservableCollection<PathInfo>();
-        private SettingsInfo _defaultSettings = new SettingsInfo()
-        {
-            Autostart = true,
-            DeleteExes = true,
-            DeleteFolder = false,
-            SendToBin = false,
-            GlobalLifeSpan = TimeSpan.FromDays(30),
-            Paths = new HashSet<PathInfo>()
-        };
+        private SettingsInfo _defaultSettings = SettingsService.Default;
 
-        private bool _deleteExes = true;
-        private bool _deleteFolder = false;
-        private bool _sendToBin = false;
-        private bool _autostart = true;
-        private TimeSpan _globalLifeSpan = TimeSpan.FromDays(30);
+        private bool? _toggleAll = false;
+        private bool[] _switches = new bool[] { true, false, false, true, true };
+        private double _selectedLifeSpan;
         public ObservableCollection<PathInfo> ObsPaths
         {
             get => _paths;
             private set
             {
                 SetProperty(ref _paths, value);
-                CheckCanExecutors();
             }
         }
         public SettingsInfo Settings
@@ -43,22 +33,50 @@ namespace Master_View.ViewModels
             private set
             {
                 SetProperty(ref _settings, value);
-                CheckCanExecutors();
             }
         }
 
 
-        public int[] LifeSpans { get; } = new int[] { 7, 14, 30, 90, 180, 365 };
-        public bool DeleteExes { get => _deleteExes; 
-            set { SetProperty(ref _deleteExes, value); } }
-        public bool DeleteFolder { get => _deleteFolder; 
-            set { SetProperty(ref _deleteFolder, value); } }
-        public bool SendToBin { get => _sendToBin; 
-            set { SetProperty(ref _sendToBin, value); } }
-        public bool Autostart { get => _autostart; 
-            set { SetProperty(ref _autostart, value); } }
-        public TimeSpan GlobalLifeSpan { get => _globalLifeSpan; 
-            set { SetProperty(ref _globalLifeSpan, value); } }
+        public double[] LifeSpans { get; } = new double[] { 7, 14, 30, 90, 180, 365 };
+
+        public bool? ToggleAll
+        {
+            get => _toggleAll;
+            set { SetProperty(ref _toggleAll, value); }
+        }
+        public bool Autostart
+        {
+            get => _switches[0];
+            set { SetProperty(ref _switches[0], value); }
+        }
+        public bool SetAllLifeToGlobal
+        {
+            get => _switches[1];
+            set { SetProperty(ref _switches[1], value); }
+        }
+        public bool DeleteExes
+        {
+            get => _switches[2];
+            set { SetProperty(ref _switches[2], value); }
+        }
+        public bool DeleteFolder
+        {
+            get => _switches[3];
+            set { SetProperty(ref _switches[3], value); }
+        }
+        public bool SendToBin
+        {
+            get => _switches[4];
+            set { SetProperty(ref _switches[4], value); }
+        }
+
+        public double SelectedLifeSpan 
+        {
+            get => _selectedLifeSpan;
+            set { SetProperty(ref _selectedLifeSpan, value); }
+        }
+
+        public DelegateCommand<string> ToggleAllCommand { get; private set; }
 
         public DelegateCommand<string> SaveSettingsCommand { get; private set; }
         public DelegateCommand<string> ResetDefaultsCommand { get; private set; }
@@ -71,7 +89,7 @@ namespace Master_View.ViewModels
         {
             //delete this in release
             ExperimentalSetup();
-            SetupElements();
+            SetupControllers();
             SetCommands();
         }
 
@@ -83,6 +101,29 @@ namespace Master_View.ViewModels
             ClearPathsCommand = new DelegateCommand<string>(ClearPaths_Execute, ClearPaths_CanExecute);
             LoadSettingsCommand = new DelegateCommand<string>(LoadSettings_Execute, LoadSettings_CanExecute);
             UsageGuideCommand = new DelegateCommand<string>(UsageGuide_Execute);
+
+            ToggleAllCommand = new DelegateCommand<string>(ToggleAll_Execute);
+        }
+
+        private TimeSpan SetSelectedLifeSpan()
+        {
+            return TimeSpan.FromDays(SelectedLifeSpan);
+        }
+        private void ToggleAll_Checker()
+        {
+
+        }
+        private void ToggleAll_Execute(string filler)
+        {
+            if (ToggleAll != null)
+            {
+                var toggle = (bool)ToggleAll;
+                Autostart = toggle;
+                DeleteExes = toggle;
+                DeleteFolder = toggle;
+                SendToBin = toggle;
+                SetAllLifeToGlobal = toggle;
+            }
         }
 
         private void CheckCanExecutors()
@@ -111,7 +152,7 @@ namespace Master_View.ViewModels
 
         private void LoadSettings_Execute(string filler)
         {
-            SetupElements();
+            SetupControllers();
         }
         private bool LoadSettings_CanExecute(string filler)
         {
@@ -131,15 +172,37 @@ namespace Master_View.ViewModels
             DeleteFolder = _defaultSettings.DeleteFolder;
             SendToBin = _defaultSettings.SendToBin;
             Autostart = _defaultSettings.Autostart;
-            GlobalLifeSpan = _defaultSettings.GlobalLifeSpan;
+            SelectedLifeSpan = _defaultSettings.GlobalLifeSpan.TotalDays;
         }
 
         private void SaveSettings_Execute(string filler)
         {
+            FinalizeConfig();
             SettingsService.SaveData(Settings);
         }
 
-        private void SetupElements()
+        private void FinalizeConfig()
+        {
+            _settings.Autostart = Autostart;
+            _settings.DeleteExes = DeleteExes;
+            _settings.DeleteFolder = DeleteFolder;
+            _settings.GlobalLifeSpan = SetSelectedLifeSpan();
+            _settings.SendToBin = SendToBin;
+
+            if (SetAllLifeToGlobal)
+            {
+                SettingsService.SetGlobalLifeTime();
+            }
+            foreach (var folder in ObsPaths)
+            {
+                if (!_settings.Paths.Contains(folder))
+                {
+                    _settings.Paths.Add(folder);
+                }
+            }
+        }
+
+        private void SetupControllers()
         {
             _settings = SettingsService.ReadData();
 
@@ -153,7 +216,7 @@ namespace Master_View.ViewModels
             DeleteFolder = Settings.DeleteFolder;
             SendToBin = Settings.SendToBin;
             Autostart = Settings.Autostart;
-            GlobalLifeSpan = Settings.GlobalLifeSpan;
+            SelectedLifeSpan = Settings.GlobalLifeSpan.TotalDays;
         }
         private void ExperimentalSetup()
         {
