@@ -21,15 +21,5 @@ namespace Master_Library.Entities
         [XmlArray("Paths"), XmlArrayItem("Path")]
         public HashSet<PathInfo> Paths { get; set; }
 
-        //public override bool Equals(object info)
-        //{
-        //    var other = (SettingsInfo)info;
-        //    return (Autostart.Equals(other.Autostart.ToString())
-        //        && DeleteExes.Equals(other.DeleteExes)
-        //        && DeleteFolder.Equals(other.DeleteFolder)
-        //        && SendToBin.Equals(other.SendToBin)
-        //        && GlobalLifeSpan.Equals(other.GlobalLifeSpan)
-        //        && Paths.Equals(other.Paths));
-        //}
     }
 }

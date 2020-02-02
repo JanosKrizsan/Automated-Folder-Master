@@ -33,10 +33,6 @@ namespace Master_Library.Services
             set => _currentSettings = value;
         }
 
-        public static TimeSpan LifeSpan { get; set; } = CurrentSettings.GlobalLifeSpan;
-
-        public static bool DeleteExes { get; set; } = CurrentSettings.DeleteExes;
-
         public static void AddToStartup()
         {
             _regKey.SetValue(_appName, _appPath);
@@ -47,35 +43,38 @@ namespace Master_Library.Services
             _regKey.DeleteValue(_appName, false);
         }
 
-        public static dynamic AddPath(string path, TimeSpan lifespan) 
+        public static void SetGlobalLifeTime(bool SetGlobal)
         {
-            var newPath = new PathInfo
+            if (SetGlobal)
             {
-                LifeSpan = lifespan,
-                Path = path
-            };
+                var updatedPaths = new HashSet<PathInfo>();
 
-            var contained = CurrentSettings.Paths.Add(newPath);
-
-            if (contained)
-            {
-                return new InvalidOperationException();
+                foreach (var path in CurrentSettings.Paths)
+                {
+                    updatedPaths.Add(new PathInfo()
+                    {
+                        Path = path.Path,
+                        LifeSpan = CurrentSettings.GlobalLifeSpan
+                    });
+                }
+                _currentSettings.Paths = updatedPaths;
             }
-            return true;
         }
 
-        public static void SetGlobalLifeTime()
+        public static void SetData(SettingsInfo info, bool SetGlobal)
         {
-            foreach (var path in CurrentSettings.Paths)
+            CurrentSettings = info;
+            switch (info.Autostart)
             {
-                var info = new PathInfo();
-                var found = CurrentSettings.Paths.TryGetValue(path, out info);
-
-                if (found)
-                {
-                    info.LifeSpan = LifeSpan;
-                }
+                case true:
+                    AddToStartup();
+                    break;
+                case false:
+                    RemoveFromStartup();
+                    break;
             }
+
+            SetGlobalLifeTime(SetGlobal);
         }
 
         public static dynamic ReadData()
@@ -95,17 +94,15 @@ namespace Master_Library.Services
             return settings;
         }
 
-        public static dynamic SaveData(SettingsInfo info)
+        public static dynamic SaveData()
         {
-            CurrentSettings = info;
-            var infoToSave = CurrentSettings;
 
             var serializer = new XmlSerializer(typeof(SettingsInfo));
             try
             {
                 using (var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName)))
                 {
-                    serializer.Serialize(writer, infoToSave);
+                    serializer.Serialize(writer, CurrentSettings);
                 }
             }
             catch(IOException e)
