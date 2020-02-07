@@ -37,10 +37,11 @@
         <Style TargetType="{x:Type RowDefinition}">
             <Setter Property="Height" Value="350"/>
         </Style>
-        <Style TargetType="{x:Type ListView}">
+        <Style TargetType="{x:Type ListBox}">
             <Setter Property="ItemsSource" Value="{Binding ObsPaths}"/>
         </Style>
-        <Style TargetType="{x:Type TreeView}">
+        <Style TargetType="{x:Type Hyperlink}">
+            <Setter Property="Command" Value="{Binding ListClickCommand}"/>
         </Style>
     </Window.Resources>
     <Grid>
@@ -52,7 +53,6 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-
         <StackPanel Grid.Row="0">
             <StackPanel Margin="0, 20">
                 <CheckBox IsThreeState="True"  Command="{Binding ToggleAllCommand}" IsChecked="{Binding ToggleAll}">Toggle All</CheckBox>
@@ -61,7 +61,7 @@
                     <CheckBox IsChecked="{Binding DeleteExes}">Delete Folders With Apps</CheckBox>
                     <CheckBox IsChecked="{Binding DeleteFolder}">Delete Folders As Well</CheckBox>
                     <CheckBox IsChecked="{Binding SendToBin}">Send Deleted To The Bin</CheckBox>
-                    <CheckBox IsChecked="{Binding SetAllLifeToGlobal}">Set all Lifetimes to Global</CheckBox>
+                    <CheckBox IsChecked="{Binding SetAllLifeToGlobal}">Set all Lifespans to Global</CheckBox>
                 </StackPanel>
             </StackPanel>
             <StackPanel>
@@ -82,19 +82,25 @@
 
         <StackPanel Grid.Row="1" VerticalAlignment="Top">
             <Label Content="Paths currently monitored:"/>
-            <ListView>
-                <ListView.ItemTemplate>
+            <ListBox x:Name="PathList">
+                <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Path=Path}"/>
+                        <TextBlock>
+                            <Hyperlink Command="{Binding DataContext.ListClickCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+                                <Hyperlink.Inlines>
+                                    <Run Text="{Binding Path=Path}"/>
+                                </Hyperlink.Inlines>
+                            </Hyperlink>
+                        </TextBlock>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
 
         <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Top">
             <Label Content="Add folders to the selected list:"/>
-            <TreeView Margin="0,10,0,0" Grid.Row="1">
-            </TreeView>
+            <TreeView Margin="0,10,0,0" Grid.Row="1"/>
         </StackPanel>
     </Grid>
 </Window>
+                                                                                      

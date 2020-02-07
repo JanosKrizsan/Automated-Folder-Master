@@ -43,22 +43,9 @@ namespace Master_Library.Services
             _regKey.DeleteValue(_appName, false);
         }
 
-        public static void SetGlobalLifeTime(bool SetGlobal)
+        public static void SetGlobalLifeTime()
         {
-            if (SetGlobal)
-            {
-                var updatedPaths = new HashSet<PathInfo>();
-
-                foreach (var path in CurrentSettings.Paths)
-                {
-                    updatedPaths.Add(new PathInfo()
-                    {
-                        Path = path.Path,
-                        LifeSpan = CurrentSettings.GlobalLifeSpan
-                    });
-                }
-                _currentSettings.Paths = updatedPaths;
-            }
+            CurrentSettings.UpdateLifeSpans();
         }
 
         public static void SetData(SettingsInfo info, bool SetGlobal)
@@ -74,7 +61,10 @@ namespace Master_Library.Services
                     break;
             }
 
-            SetGlobalLifeTime(SetGlobal);
+            if (SetGlobal)
+            {
+                SetGlobalLifeTime();
+            }
         }
 
         public static dynamic ReadData()

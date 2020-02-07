@@ -20,6 +20,32 @@ namespace Master_Library.Entities
         public TimeSpan GlobalLifeSpan { get; set; }
         [XmlArray("Paths"), XmlArrayItem("Path")]
         public HashSet<PathInfo> Paths { get; set; }
+        public void AddPath(PathInfo info)
+        {
+            Paths.Add(info);
+        }
+        public void RemovePath(PathInfo info)
+        {
+            Paths.Remove(info);
+        }
+        public void UpdatePath(PathInfo persisted, PathInfo updated)
+        {
+            RemovePath(persisted);
+            AddPath(updated);
+        }
+        public void UpdateLifeSpans()
+        {
+            var updatedPaths = new HashSet<PathInfo>();
 
+            foreach (var path in Paths)
+            {
+                updatedPaths.Add(new PathInfo()
+                {
+                    Path = path.Path,
+                    LifeSpan = GlobalLifeSpan
+                });
+            }
+            Paths = updatedPaths;
+        }
     }
 }
