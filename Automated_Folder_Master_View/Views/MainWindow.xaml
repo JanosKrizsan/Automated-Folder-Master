@@ -105,11 +105,11 @@
 
         <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Top">
             <Label Content="Add folders to the selected list:"/>
-            <Button x:Name="Back" Content="..." Command="{Binding FolderMoveBackCommand}" HorizontalAlignment="Left">
+            <Button x:Name="Back" Content="Back" Command="{Binding FolderMoveBackCommand}" HorizontalAlignment="Left">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Height" Value="18"/>
-                        <Setter Property="Width" Value="18"/>
+                        <Setter Property="Width" Value="30"/>
                         <Setter Property="HorizontalAlignment" Value="Left"/>
                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
                     </Style>
@@ -119,7 +119,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="+" Command="{Binding vm.AddCurrentPathCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type StackPanel}}}">
+                            <Button Content="+" Command="{Binding Path=DataContext.AddCurrentPathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type StackPanel}}}">
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
                                         <Setter Property="Background" Value="#E59400"/>

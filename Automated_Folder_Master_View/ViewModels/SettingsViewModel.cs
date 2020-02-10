@@ -47,7 +47,6 @@ namespace Master_View.ViewModels
             private set
             {
                 SetProperty(ref _settings, value);
-                LoadSettingsCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -147,6 +146,7 @@ namespace Master_View.ViewModels
 
         private void OpenPath_Execute(Hyperlink pathToOpen)
         {
+            //try-catch for unauthorized access
             _currentTempFolder = (SimplePath)pathToOpen.DataContext;
 
             var updatedPathList = new ObservableCollection<SimplePath>();
@@ -163,11 +163,10 @@ namespace Master_View.ViewModels
 
         private void AddPath_Execute(StackPanel pathInfo)
         {
-            var textBlock = (TextBlock)pathInfo.Children[1];
-            var info = textBlock.Inlines.Count;
-
             var folder = (SimplePath)pathInfo.DataContext;
-            ObsPaths.Add(new PathInfo() { Path = folder.FullPath, LifeSpan = Settings.GlobalLifeSpan });
+            var newPath = new PathInfo() { Path = folder.FullPath, LifeSpan = Settings.GlobalLifeSpan };
+            ObsPaths.Add(newPath);
+            _settings.Paths.Add(newPath);
         }
 
         private void FolderMoveBack_Execute(string filler)
@@ -175,38 +174,40 @@ namespace Master_View.ViewModels
             var current = _currentTempFolder.FullPath;
             if (!string.IsNullOrEmpty(current))
             {
-                var resetFolders = new ObservableCollection<SimplePath>();
-                var parentDir = Directory.GetParent(current);
-                var isDrive = false;
-
-                if (parentDir != null)
+                var isParentMyComp = false;
+                var drives = DriveInfo.GetDrives().ToList();
+                foreach (var drive in drives)
                 {
-                    var drives = DriveInfo.GetDrives().ToList();
-                    foreach (var drive in drives)
+                    if (drive.Name.Equals(current))
                     {
-                        if (drive.Name.Equals(parentDir.Name))
-                        {
-                            isDrive = true;
-                            break;
-                        }
+                        isParentMyComp = true;
+                        break;
                     }
                 }
 
-                if (parentDir != null && !isDrive)
+                if (isParentMyComp)
                 {
-                    var parentSubs = Directory.GetDirectories(parentDir.FullName);
-
-                    foreach (var dir in parentSubs)
-                    {
-                        var dirName = Path.GetFileName(dir);
-                        resetFolders.Add(new SimplePath() { FullPath = dir, Name = dirName });
-                    }
-
-                    PathsCurrentlyViewed = resetFolders;
+                    UpdateDrives();
                 }
                 else
                 {
-                    UpdateDrives();
+                    var parentDir = Directory.GetParent(current);
+
+                    if (parentDir != null)
+                    {
+                        var resetFolders = new ObservableCollection<SimplePath>();
+                        var parentSubs = Directory.GetDirectories(parentDir.FullName);
+
+                        foreach (var dir in parentSubs)
+                        {
+                            var dirName = Path.GetFileName(dir);
+                            resetFolders.Add(new SimplePath() { FullPath = dir, Name = dirName });
+                        }
+                        PathsCurrentlyViewed = resetFolders;
+
+                        var parentName = Path.GetFileName(parentDir.FullName);
+                        _currentTempFolder = new SimplePath() { FullPath = parentDir.FullName, Name = parentName };
+                    }
                 }
             }
         }
@@ -270,7 +271,7 @@ namespace Master_View.ViewModels
 
         private void LoadSettings_Execute(string filler)
         {
-            SetupControllers();
+            SetupControllers(true);
         }
         private bool ResetDefaults_CanExecute(string filler)
         {
@@ -290,7 +291,7 @@ namespace Master_View.ViewModels
             SettingsService.SaveData();
         }
 
-        private void SetupControllers()
+        private void SetupControllers(bool reload = false)
         {
             _settings = SettingsService.ReadData();
             ObsPaths = new ObservableCollection<PathInfo>();
@@ -300,7 +301,10 @@ namespace Master_View.ViewModels
                 ObsPaths.Add(folder);
             }
 
-            UpdateDrives();
+            if (!reload)
+            {
+                UpdateDrives();
+            }
             UpdateValues();
         }
         private void UpdateDrives()
