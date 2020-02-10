@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Windows;
-using Master_View.Views;
 
 namespace Master_View.Services
 {

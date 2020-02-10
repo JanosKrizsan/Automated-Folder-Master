@@ -6,6 +6,8 @@ using Master_View.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows.Controls;
 using System.Windows.Documents;
 
 namespace Master_View.ViewModels
@@ -15,9 +17,11 @@ namespace Master_View.ViewModels
         private SettingsInfo _settings = new SettingsInfo();
 
         private ObservableCollection<PathInfo> _paths;
+        private ObservableCollection<SimplePath> _viewedPaths;
         private SettingsInfo _defaultSettings = SettingsService.Default;
 
         private bool? _toggleAll = false;
+        private SimplePath _currentTempFolder;
         private bool _setAllGlobal = false;
         private List<int> Switches { get; set; } = new List<int>() { 0, 0, 0, 0, 0 };
         public ObservableCollection<PathInfo> ObsPaths
@@ -28,12 +32,21 @@ namespace Master_View.ViewModels
                 SetProperty(ref _paths, value);
             }
         }
+        public ObservableCollection<SimplePath> PathsCurrentlyViewed
+        {
+            get => _viewedPaths;
+            private set
+            {
+                SetProperty(ref _viewedPaths, value);
+            }
+        }
         public SettingsInfo Settings
         {
             get => _settings;
             private set
             {
                 SetProperty(ref _settings, value);
+                LoadSettingsCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -99,6 +112,10 @@ namespace Master_View.ViewModels
         public DelegateCommand<string> ClearPathsCommand { get; private set; }
         public DelegateCommand<string> LoadSettingsCommand { get; private set; }
         public DelegateCommand<string> UsageGuideCommand { get; private set; }
+        public DelegateCommand<StackPanel> AddCurrentPathCommand { get; private set; }
+        public DelegateCommand<Hyperlink> OpenPathCommand { get; private set; }
+        public DelegateCommand<string> FolderMoveBackCommand { get; private set; }
+
 
 
         public SettingsViewModel()
@@ -112,19 +129,66 @@ namespace Master_View.ViewModels
 
         private void SetCommands()
         {
-            SaveSettingsCommand = new DelegateCommand<string>(SaveSettings_Execute, LoadSettings_CanExecute);
+            SaveSettingsCommand = new DelegateCommand<string>(SaveSettings_Execute);
             ResetDefaultsCommand = new DelegateCommand<string>(ResetDefaults_Execute, ResetDefaults_CanExecute);
             ClearPathsCommand = new DelegateCommand<string>(ClearPaths_Execute, ClearPaths_CanExecute);
-            LoadSettingsCommand = new DelegateCommand<string>(LoadSettings_Execute, LoadSettings_CanExecute);
+            LoadSettingsCommand = new DelegateCommand<string>(LoadSettings_Execute);
             UsageGuideCommand = new DelegateCommand<string>(UsageGuide_Execute);
 
             ToggleAllCommand = new DelegateCommand<string>(ToggleAll_Execute);
             ListClickCommand = new DelegateCommand<Hyperlink>(ListDoubleClick_Execute);
+
+            FolderMoveBackCommand = new DelegateCommand<string>(FolderMoveBack_Execute);
+            AddCurrentPathCommand = new DelegateCommand<StackPanel>(AddPath_Execute);
+            OpenPathCommand = new DelegateCommand<Hyperlink>(OpenPath_Execute);
+
         }
 
-        private void ListDoubleClick_Execute(Hyperlink filler)
+        private void OpenPath_Execute(Hyperlink pathToOpen)
         {
-            var path = (PathInfo)filler.DataContext;
+            var _currentTempFolder = (SimplePath)pathToOpen.DataContext;
+
+            var updatedPathList = new ObservableCollection<SimplePath>();
+            var innerFolders = Directory.GetDirectories(_currentTempFolder.FullPath);
+
+            foreach(var folder in innerFolders)
+            {
+                var dirName = Path.GetFileName(folder);
+                updatedPathList.Add(new SimplePath() { FullPath = folder, Name = dirName });
+            }
+
+            PathsCurrentlyViewed = updatedPathList;
+        }
+
+        private void AddPath_Execute(StackPanel pathInfo)
+        {
+            var textBlock = (TextBlock)pathInfo.Children[1];
+            var info = textBlock.Inlines.Count;
+
+            var folder = (SimplePath)pathInfo.DataContext;
+            ObsPaths.Add(new PathInfo() { Path = folder.FullPath, LifeSpan = Settings.GlobalLifeSpan });
+        }
+
+        private void FolderMoveBack_Execute(string filler)
+        {
+            if (_currentTempFolder.FullPath != null)
+            {
+                var resetFolders = new ObservableCollection<SimplePath>();
+
+                var rootDir = Directory.GetDirectoryRoot(_currentTempFolder.FullPath);
+
+                foreach(var dir in Directory.GetDirectories(rootDir))
+                {
+                    resetFolders.Add(new SimplePath() { FullPath = dir, Name = Path.GetDirectoryName(dir) });
+                }
+
+                PathsCurrentlyViewed = resetFolders;
+            }
+        }
+
+        private void ListDoubleClick_Execute(Hyperlink pathToEdit)
+        {
+            var path = (PathInfo)pathToEdit.DataContext;
             var pathWindow = new PathEditWindow();
             pathWindow.DataContext = new PathEditViewModel(path, pathWindow, Settings, ObsPaths);
             pathWindow.Show();
@@ -155,11 +219,11 @@ namespace Master_View.ViewModels
             if (ToggleAll != null)
             {
                 var toggle = (bool)ToggleAll;
-                    Autostart = toggle;
-                    DeleteExes = toggle;
-                    DeleteFolder = toggle;
-                    SendToBin = toggle;
-                    SetAllLifeToGlobal = toggle;
+                Autostart = toggle;
+                DeleteExes = toggle;
+                DeleteFolder = toggle;
+                SendToBin = toggle;
+                SetAllLifeToGlobal = toggle;
             }
         }
 
@@ -183,11 +247,6 @@ namespace Master_View.ViewModels
         {
             SetupControllers();
         }
-        private bool LoadSettings_CanExecute(string filler)
-        {
-            return !(Settings.Equals(SettingsService.ReadData()));
-        }
-
         private bool ResetDefaults_CanExecute(string filler)
         {
             return !Settings.Equals(_defaultSettings);
@@ -210,12 +269,19 @@ namespace Master_View.ViewModels
         {
             _settings = SettingsService.ReadData();
             ObsPaths = new ObservableCollection<PathInfo>();
+            PathsCurrentlyViewed = new ObservableCollection<SimplePath>();
 
             foreach (var folder in Settings.Paths)
             {
                 ObsPaths.Add(folder);
             }
 
+            var drives = DriveInfo.GetDrives();
+
+            foreach (var drive in drives)
+            {
+                PathsCurrentlyViewed.Add(new SimplePath() { FullPath = drive.Name, Name = drive.Name});
+            }
 
             UpdateValues();
         }
