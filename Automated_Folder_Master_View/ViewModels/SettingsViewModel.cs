@@ -208,7 +208,7 @@ namespace Master_View.ViewModels
                 var isParentMyComp = false;
                 var drives = DriveInfo.GetDrives().ToList();
 
-                var any = drives.Any(drive => drive.Name.Equals(current))
+                var any = drives.Any(drive => drive.Name.Equals(current));
 
                 foreach (var drive in drives)
                 {
