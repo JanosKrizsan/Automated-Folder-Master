@@ -27,7 +27,6 @@ namespace Master_Console
 
             _settings = new SettingsInfo();
 
-            _settings.AutoStartPath = string.Empty;
             _settings.DeleteExes = true;
             _settings.Paths = new HashSet<PathInfo>();
             _settings.DeleteFolder = IOHandlingService.YesOrNoInput(IOHandlingService.FolderDelOrNot);

@@ -3,11 +3,15 @@ using System.Windows.Input;
 
 namespace Master_Library.Entities
 {
-    class DelegateCommand<T> : ICommand where T : class
+    public class DelegateCommand<T> : ICommand where T : class
     {
 
-        private readonly Predicate<T> _canExecute;
         private readonly Action<T> _execute;
+        private readonly Predicate<T> _canExecute;
+
+        public DelegateCommand()
+        {
+        }
 
         public DelegateCommand(Action<T> execute)
             : this(execute, null)
