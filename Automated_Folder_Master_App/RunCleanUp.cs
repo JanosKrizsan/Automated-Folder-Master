@@ -129,14 +129,17 @@ namespace Master_Console
 
         private static void ReadSettings()
         {
-            dynamic info = SettingsService.ReadData();
+            var info = new SettingsInfo();
 
-            if (info is Exception)
+            try
             {
-                ErrorHandlingService.ExceptionHandler(info);
-                return;
+                info = SettingsService.ReadData();
             }
-            
+            catch(Exception e)
+            {
+                ErrorHandlingService.ExceptionHandler(e);
+            }
+
             _settings = info;
         }
 

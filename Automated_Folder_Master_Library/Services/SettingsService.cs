@@ -67,37 +67,25 @@ namespace Master_Library.Services
             }
         }
 
-        public static dynamic ReadData()
+        public static SettingsInfo ReadData()
         {
             var serializer = new XmlSerializer(typeof(SettingsInfo));
-            dynamic settings = new SettingsInfo();
-            try
-            {
-                using var stream = new FileStream(string.Concat(_saveFilePath, _fileName), FileMode.Open, FileAccess.Read);
-                var reader = new XmlTextReader(stream);
-                settings = (SettingsInfo)serializer.Deserialize(reader);
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
+            var settings = new SettingsInfo();
+
+            using var stream = new FileStream(string.Concat(_saveFilePath, _fileName), FileMode.Open, FileAccess.Read);
+            var reader = new XmlTextReader(stream);
+            settings = (SettingsInfo)serializer.Deserialize(reader);
+
             return settings;
         }
 
-        public static dynamic SaveData()
+        public static bool SaveData()
         {
-
             var serializer = new XmlSerializer(typeof(SettingsInfo));
-            try
+
+            using (var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName)))
             {
-                using (var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName)))
-                {
-                    serializer.Serialize(writer, CurrentSettings);
-                }
-            }
-            catch(IOException e)
-            {
-                return e;
+                serializer.Serialize(writer, CurrentSettings);
             }
             return true;
         }

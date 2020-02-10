@@ -8,8 +8,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using static Master_View.Services.ErrorHandlingService;
 
 namespace Master_View.ViewModels
 {
@@ -146,27 +148,56 @@ namespace Master_View.ViewModels
 
         private void OpenPath_Execute(Hyperlink pathToOpen)
         {
-            //try-catch for unauthorized access
-            _currentTempFolder = (SimplePath)pathToOpen.DataContext;
-
-            var updatedPathList = new ObservableCollection<SimplePath>();
-            var innerFolders = Directory.GetDirectories(_currentTempFolder.FullPath);
-
-            foreach(var folder in innerFolders)
+            try
             {
-                var dirName = Path.GetFileName(folder);
-                updatedPathList.Add(new SimplePath() { FullPath = folder, Name = dirName });
-            }
+                _currentTempFolder = (SimplePath)pathToOpen.DataContext;
 
-            PathsCurrentlyViewed = updatedPathList;
+                var updatedPathList = new ObservableCollection<SimplePath>();
+                var innerFolders = Directory.GetDirectories(_currentTempFolder.FullPath);
+
+                foreach(var folder in innerFolders)
+                {
+                    var dirName = Path.GetFileName(folder);
+                    updatedPathList.Add(new SimplePath() { FullPath = folder, Name = dirName });
+                }
+
+                PathsCurrentlyViewed = updatedPathList;
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler(e);
+            }
         }
 
         private void AddPath_Execute(StackPanel pathInfo)
         {
             var folder = (SimplePath)pathInfo.DataContext;
-            var newPath = new PathInfo() { Path = folder.FullPath, LifeSpan = Settings.GlobalLifeSpan };
-            ObsPaths.Add(newPath);
-            _settings.Paths.Add(newPath);
+            var isExisting = false;
+            var currentPaths = _settings.Paths.ToList();
+
+            foreach (var path in currentPaths)
+            {
+                var pathChecked = path.Path.Replace("\\","");
+                var pathToAdd = folder.FullPath.Replace("\\", "");
+
+                if (pathChecked == pathToAdd)
+                {
+                    isExisting = true;
+                    break;
+                }
+            }
+
+            if (!isExisting)
+            {
+                var newPath = new PathInfo() { Path = folder.FullPath, LifeSpan = Settings.GlobalLifeSpan };
+                ObsPaths.Add(newPath);
+                Settings.Paths.Add(newPath);
+                PopupHandler.SuccessPopup($"New path: {newPath.Path} successfully added.");
+            }
+            else
+            {
+                ExceptionHandler(new InvalidOperationException());
+            }
         }
 
         private void FolderMoveBack_Execute(string filler)
@@ -176,6 +207,9 @@ namespace Master_View.ViewModels
             {
                 var isParentMyComp = false;
                 var drives = DriveInfo.GetDrives().ToList();
+
+                var any = drives.Any(drive => drive.Name.Equals(current))
+
                 foreach (var drive in drives)
                 {
                     if (drive.Name.Equals(current))
@@ -187,7 +221,7 @@ namespace Master_View.ViewModels
 
                 if (isParentMyComp)
                 {
-                    UpdateDrives();
+                    UpdateDrives(drives);
                 }
                 else
                 {
@@ -201,12 +235,12 @@ namespace Master_View.ViewModels
                         foreach (var dir in parentSubs)
                         {
                             var dirName = Path.GetFileName(dir);
-                            resetFolders.Add(new SimplePath() { FullPath = dir, Name = dirName });
+                            resetFolders.Add(SimplePathCreator(dir, dirName));
                         }
                         PathsCurrentlyViewed = resetFolders;
 
                         var parentName = Path.GetFileName(parentDir.FullName);
-                        _currentTempFolder = new SimplePath() { FullPath = parentDir.FullName, Name = parentName };
+                        _currentTempFolder = SimplePathCreator(parentDir.FullName, parentName);
                     }
                 }
             }
@@ -268,6 +302,7 @@ namespace Master_View.ViewModels
             ObsPaths = new ObservableCollection<PathInfo>();
             _settings.Paths = new HashSet<PathInfo>();
             RaiseCanExecuteEvents();
+            PopupHandler.SuccessPopup("All paths have been cleared.");
         }
 
         private bool ClearPaths_CanExecute(string filler)
@@ -277,8 +312,13 @@ namespace Master_View.ViewModels
 
         private void LoadSettings_Execute(string filler)
         {
-            SetupControllers(true);
+            var successfulLoad = SetupControllers(true);
             RaiseCanExecuteEvents();
+
+            if (successfulLoad)
+            {
+                PopupHandler.SuccessPopup("Successfully loaded your settings.");
+            }
         }
         private bool ResetDefaults_CanExecute(string filler)
         {
@@ -291,18 +331,39 @@ namespace Master_View.ViewModels
             Settings = _defaultSettings;
             UpdateValues();
             RaiseCanExecuteEvents();
+
+            PopupHandler.SuccessPopup("Successfully reset your settings.");
         }
 
         private void SaveSettings_Execute(string filler)
         {
             SettingsService.SetData(Settings, SetAllLifeToGlobal);
-            SettingsService.SaveData();
+            try
+            {
+                var saveSuccess = SettingsService.SaveData();
+                if (saveSuccess)
+                {
+                    PopupHandler.SuccessPopup("Successfully saved your settings.");
+                }
+            }
+            catch(Exception e)
+            {
+                ExceptionHandler(e);
+            }
         }
 
-        private void SetupControllers(bool reload = false)
+        private bool SetupControllers(bool reload = false)
         {
-            _settings = SettingsService.ReadData();
+            _settings = SettingsService.Default;
             ObsPaths = new ObservableCollection<PathInfo>();
+            try
+            {
+                _settings = SettingsService.ReadData();
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler(e);
+            }
 
             foreach (var folder in Settings.Paths)
             {
@@ -313,16 +374,18 @@ namespace Master_View.ViewModels
             {
                 UpdateDrives();
             }
+
             UpdateValues();
+            return true;
         }
-        private void UpdateDrives()
+        private void UpdateDrives(List<DriveInfo> driveInfos = null)
         {
             PathsCurrentlyViewed = new ObservableCollection<SimplePath>();
-            var drives = DriveInfo.GetDrives();
+            driveInfos ??= DriveInfo.GetDrives().ToList();
 
-            foreach (var drive in drives)
+            foreach (var drive in driveInfos)
             {
-                PathsCurrentlyViewed.Add(new SimplePath() { FullPath = drive.Name, Name = drive.Name });
+                PathsCurrentlyViewed.Add(SimplePathCreator(drive.Name, drive.Name));
             }
         }
         private void UpdateValues()
@@ -350,6 +413,16 @@ namespace Master_View.ViewModels
             return Convert.ToInt32(value);
         }
 
+        private SimplePath SimplePathCreator(string path, string name)
+        {
+            return new SimplePath()
+            {
+                FullPath = path,
+                Name = name
+            };
+        }
+        
+        //TODO ->delete before final version
         private void ExperimentalSetup()
         {
             var paths = new HashSet<PathInfo>
