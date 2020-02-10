@@ -3,9 +3,9 @@ using System.Management;
 
 namespace Master_Console.Services
 {
-    public static class ParentProcessGetterService
+    public class ParentProcessGetterService
     {
-        public static Process GetParentProcess(Process process)
+        public Process GetParentProcess(Process process)
         {
             var thisId = process.Id;
             var query = string.Format("SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {0}", thisId);

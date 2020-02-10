@@ -25,20 +25,20 @@ namespace Master_View.Services
                     break;
                 case "System.IO.DirectoryNotFoundException":
                 case "System.IO.FileNotFoundException":
-                    text = "The save file could not be found, or there was an error creating it!";
+                    text = "The save file could not be found, or is corrupted!";
                     caption = "Save File Error";
-                    icon = MessageBoxImage.Error;
+                    icon = MessageBoxImage.Warning;
                     break;
                 case "System.Exception":
                     text = "An unknown error has occurred, please seek advice from the creator.";
                     caption = "Unknown Error";
                     break;
             }
-            PopupHandler.ErrorPopup(text, caption, button, icon);
+            PopupHandler.Popup(text, caption, button, icon);
         }
         public static class PopupHandler
         {
-            public static void ErrorPopup(string text, string caption, MessageBoxButton button, MessageBoxImage icon)
+            public static void Popup(string text, string caption, MessageBoxButton button, MessageBoxImage icon)
             {
                 MessageBox.Show(text, caption, button, icon);
             }

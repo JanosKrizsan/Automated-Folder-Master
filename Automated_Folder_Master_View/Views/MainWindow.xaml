@@ -5,11 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Master_View.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Width="600" Height="600" MinWidth="600" MaxWidth="800" MinHeight="600" MaxHeight="800">
+        Title="Folder Master Settings" Width="600" Height="600" MinWidth="600" MaxWidth="800" MinHeight="600" MaxHeight="800">
     <Window.DataContext>
         <vm:SettingsViewModel/>
     </Window.DataContext>
     <Window.Resources>
+        <Style x:Key="HyperlinkStyle" TargetType="{x:Type Hyperlink}">
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="TextDecorations" Value="{x:Null}"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="4, 8"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="90" />
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="20" Background="NavajoWhite" BorderBrush="Black" BorderThickness="0,2,2,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="Height" Value="20"/>
             <Setter Property="Width" Value="80"/>
@@ -25,11 +46,7 @@
         <Style TargetType="{x:Type CheckBox}">
             <Setter Property="Margin" Value="20, 5"/>
         </Style>
-        <Style TargetType="{x:Type Button}">
-            <Setter Property="Margin" Value="4, 8"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Width" Value="80" />
-        </Style>
+        
         <Style TargetType="{x:Type ColumnDefinition}">
             <Setter Property="Width" Value="300"/>
         </Style>
@@ -50,6 +67,7 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -72,11 +90,11 @@
             </StackPanel>
             <StackPanel>
                 <WrapPanel>
-                    <Button Command="{Binding SaveSettingsCommand}" Content="_Save Settings"/>
-                    <Button Command="{Binding ResetDefaultsCommand}" Content="_Reset Defaults"/>
-                    <Button Command="{Binding ClearPathsCommand}" Content="_Clear Paths"/>
-                    <Button Command="{Binding LoadSettingsCommand}" Content="_Load Settings"/>
-                    <Button Command="{Binding UsageGuideCommand}" Content="_Usage Guide"/>
+                    <Button Command="{Binding SaveSettingsCommand}" Content="Save Settings"/>
+                    <Button Command="{Binding ResetDefaultsCommand}" Content="Reset Defaults"/>
+                    <Button Command="{Binding ClearPathsCommand}" Content="Clear Paths"/>
+                    <Button Command="{Binding LoadSettingsCommand}" Content="Load Settings"/>
+                    <Button Command="{Binding UsageGuideCommand}" Content="Usage Guide"/>
                 </WrapPanel>
                 <WrapPanel Margin="30">
                     <Label Content="Delete after this many days :"/>
@@ -92,7 +110,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock>
-                            <Hyperlink Command="{Binding DataContext.ListClickCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+                            <Hyperlink Command="{Binding DataContext.ListClickCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource HyperlinkStyle}">
                                 <Hyperlink.Inlines>
                                     <Run Text="{Binding Path=Path}"/>
                                 </Hyperlink.Inlines>
@@ -108,14 +126,28 @@
             <Button x:Name="Back" Content="Back" Command="{Binding FolderMoveBackCommand}" HorizontalAlignment="Left">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
-                        <Setter Property="Height" Value="18"/>
-                        <Setter Property="Width" Value="30"/>
+                        <Setter Property="Height" Value="30"/>
+                        <Setter Property="Width" Value="40"/>
                         <Setter Property="HorizontalAlignment" Value="Left"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="0,5"/>
+                        <Setter Property="Background" Value="#ffd633"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border CornerRadius="10" Background="LightBlue" BorderBrush="Black" BorderThickness="0,2,2,0" >
+                                        <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </Button.Style>
             </Button>
-            <ListBox ItemsSource="{Binding PathsCurrentlyViewed}" HorizontalAlignment="Left" MaxHeight="300">
+            <ListBox ItemsSource="{Binding PathsCurrentlyViewed}" HorizontalAlignment="Left" MaxHeight="280">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -123,14 +155,28 @@
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
                                         <Setter Property="Background" Value="#E59400"/>
-                                        <Setter Property="Height" Value="15"/>
-                                        <Setter Property="Width" Value="15"/>
+                                        <Setter Property="Height" Value="20"/>
+                                        <Setter Property="Width" Value="20"/>
                                         <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Margin" Value="5,0"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="10" Background="Orange" BorderBrush="Black" BorderThickness="0,2,2,0" >
+                                                        <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
                                 </Button.Style>
                             </Button>
                             <TextBlock>
                             <Hyperlink Command="{Binding DataContext.OpenPathCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+
                                 <Hyperlink.Inlines>
                                     <Run Text="{Binding Path=Name}"/>
                                 </Hyperlink.Inlines>
