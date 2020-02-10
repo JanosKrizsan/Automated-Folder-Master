@@ -27,12 +27,6 @@ namespace Master_Library.Services
             Paths = new HashSet<PathInfo>()
         };
 
-        public static SettingsInfo CurrentSettings
-        {
-            get => _currentSettings;
-            set => _currentSettings = value;
-        }
-
         public static void AddToStartup()
         {
             _regKey.SetValue(_appName, _appPath);
@@ -45,12 +39,12 @@ namespace Master_Library.Services
 
         public static void SetGlobalLifeTime()
         {
-            CurrentSettings.UpdateLifeSpans();
+            _currentSettings.UpdateLifeSpans();
         }
 
         public static void SetData(SettingsInfo info, bool SetGlobal)
         {
-            CurrentSettings = info;
+            _currentSettings = info;
             switch (info.Autostart)
             {
                 case true:
@@ -79,15 +73,12 @@ namespace Master_Library.Services
             return settings;
         }
 
-        public static bool SaveData()
+        public static void SaveData()
         {
             var serializer = new XmlSerializer(typeof(SettingsInfo));
 
-            using (var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName)))
-            {
-                serializer.Serialize(writer, CurrentSettings);
-            }
-            return true;
+            using var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName));
+            serializer.Serialize(writer, _currentSettings);
         }
         private static string GetExecutingConsoleDirectory()
         {

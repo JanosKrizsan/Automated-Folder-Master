@@ -5,27 +5,29 @@ namespace Master_Console.Services
 {
     public static class ExecutionManagementService
     {
+        private static RunCleanUp _cleanUp = new RunCleanUp();
+        private static ParentProcessGetterService _parentGetter = new ParentProcessGetterService();
         public static void ManageProgramRoute(Process process)
         {
-            var parent = ParentProcessGetterService.GetParentProcess(process);
+            var parent = _parentGetter.GetParentProcess(process);
             var startupTimelapse = DateTime.Now.Subtract(parent.StartTime);
             
             //TODO take out vs code starter condition on release
 
             if ((parent.ProcessName.Equals("explorer") && startupTimelapse.TotalMinutes >= 2))
             {
-                RunCleanUp.ManualSetup();
+                _cleanUp.ManualSetup();
             }
             else if (parent.ProcessName.Equals("VsDebugConsole"))
             {
-                RunCleanUp.ManualSetup();
+                _cleanUp.ManualSetup();
             }
             else
             {
-                RunCleanUp.AutomaticSetup();
+                _cleanUp.AutomaticSetup();
             }
 
-            RunCleanUp.DoCleanup();
+            _cleanUp.DoCleanup();
         }
     }
 }

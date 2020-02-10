@@ -25,9 +25,9 @@ namespace Master_View.Services
                     break;
                 case "System.IO.DirectoryNotFoundException":
                 case "System.IO.FileNotFoundException":
-                    text = "The save file could not be found, or there was an error creating it!";
+                    text = "The save file could not be found, or is corrupted!";
                     caption = "Save File Error";
-                    icon = MessageBoxImage.Error;
+                    icon = MessageBoxImage.Warning;
                     break;
                 case "System.Exception":
                     text = "An unknown error has occurred, please seek advice from the creator.";

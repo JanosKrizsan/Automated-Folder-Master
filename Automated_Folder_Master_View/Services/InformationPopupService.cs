@@ -11,8 +11,6 @@ namespace Master_View.Services
         private const string _usageGuideFourth = "Below that, you can select how many days should a file be able to exist before being atuomatically deleted.";
         private const string _usageGuideFifth = "You can toggle the three checkboxes in the top left, switching on/off specific deletion-features.";
 
-
-
         public static void UsageGuidePopup()
         {
             var concatenated = new StringBuilder();

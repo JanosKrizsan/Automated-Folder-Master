@@ -9,34 +9,35 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace Master_Console
 {
-    public static class RunCleanUp
+    public class RunCleanUp
     {
-        private static SettingsInfo _settings;
-        private static List<PathInfo> _folders;
+        private SettingsInfo _settings;
+        private List<PathInfo> _folders;
+        private IOHandlingService _IOService = new IOHandlingService();
 
-        public static void DoCleanup()
+        public void DoCleanup()
         {
             _folders.ForEach((folder) => DetermineDeletion(folder));
 
             ShutdownErrorService();
         }
 
-        public static void ManualSetup()
+        public void ManualSetup()
         {
-            IOHandlingService.Introduction();
+            _IOService.Introduction();
 
             _settings = new SettingsInfo();
 
             _settings.DeleteExes = true;
             _settings.Paths = new HashSet<PathInfo>();
-            _settings.DeleteFolder = IOHandlingService.YesOrNoInput(IOHandlingService.FolderDelOrNot);
-            _settings.SendToBin = IOHandlingService.YesOrNoInput(IOHandlingService.BinOrNot);
+            _settings.DeleteFolder = _IOService.YesOrNoInput(IOHandlingService.FolderDelOrNot);
+            _settings.SendToBin = _IOService.YesOrNoInput(IOHandlingService.BinOrNot);
 
-            _settings.GlobalLifeSpan = IOHandlingService.LifeSpanInput();
+            _settings.GlobalLifeSpan = _IOService.LifeSpanInput();
 
             var path = new PathInfo
             {
-                Path = IOHandlingService.PathInput(),
+                Path = _IOService.PathInput(),
                 LifeSpan = _settings.GlobalLifeSpan
             };
 
@@ -44,11 +45,11 @@ namespace Master_Console
 
             _folders = _settings.Paths?.ToList();
 
-            IOHandlingService.SuccessConfirmer();
+            _IOService.SuccessConfirmer();
 
         }
 
-        public static void AutomaticSetup()
+        public void AutomaticSetup()
         {
             ReadSettings();
             var folders = ReadFolders();
@@ -63,7 +64,7 @@ namespace Master_Console
             }
         }
 
-        private static void DetermineDeletion(PathInfo folder)
+        private void DetermineDeletion(PathInfo folder)
         {
             var lifeSpan = folder.LifeSpan;
             var directory = folder.Path;
@@ -94,7 +95,7 @@ namespace Master_Console
             }
         }
 
-        private static void DeleteFile(string path)
+        private void DeleteFile(string path)
         {
             if (_settings.SendToBin)
             {
@@ -106,7 +107,7 @@ namespace Master_Console
             }
         }
 
-        private static void DeleteDirectory(string path, string[] files)
+        private void DeleteDirectory(string path, string[] files)
         {
             if (_settings.SendToBin)
             {
@@ -122,12 +123,12 @@ namespace Master_Console
             }
         }
 
-        private static List<PathInfo> ReadFolders()
+        private List<PathInfo> ReadFolders()
         {
             return _settings.Paths?.ToList();
         }
 
-        private static void ReadSettings()
+        private void ReadSettings()
         {
             var info = new SettingsInfo();
 
@@ -143,7 +144,7 @@ namespace Master_Console
             _settings = info;
         }
 
-        private static void ShutdownErrorService()
+        private void ShutdownErrorService()
         {
             ErrorHandlingService.Shutdown();
         }
