@@ -34,11 +34,11 @@ namespace Master_View.Services
                     caption = "Unknown Error";
                     break;
             }
-            PopupHandler.ErrorPopup(text, caption, button, icon);
+            PopupHandler.Popup(text, caption, button, icon);
         }
         public static class PopupHandler
         {
-            public static void ErrorPopup(string text, string caption, MessageBoxButton button, MessageBoxImage icon)
+            public static void Popup(string text, string caption, MessageBoxButton button, MessageBoxImage icon)
             {
                 MessageBox.Show(text, caption, button, icon);
             }

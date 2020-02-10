@@ -133,7 +133,7 @@ namespace Master_View.ViewModels
             UsageGuideCommand = new DelegateCommand<string>(UsageGuide_Execute);
 
             ToggleAllCommand = new DelegateCommand<string>(ToggleAll_Execute);
-            ListClickCommand = new DelegateCommand<Hyperlink>(ListDoubleClick_Execute);
+            ListClickCommand = new DelegateCommand<Hyperlink>(ListClick_Execute);
 
             FolderMoveBackCommand = new DelegateCommand<string>(FolderMoveBack_Execute);
             AddCurrentPathCommand = new DelegateCommand<StackPanel>(AddPath_Execute);
@@ -214,7 +214,7 @@ namespace Master_View.ViewModels
             }
         }
 
-        private void ListDoubleClick_Execute(Hyperlink pathToEdit)
+        private void ListClick_Execute(Hyperlink pathToEdit)
         {
             var path = (PathInfo)pathToEdit.DataContext;
             var pathWindow = new PathEditWindow();
