@@ -221,6 +221,11 @@ namespace Master_View.ViewModels
 
         }
 
+        private void RaiseCanExecuteEvents()
+        {
+            ResetDefaultsCommand.RaiseCanExecuteChanged();
+            ClearPathsCommand.RaiseCanExecuteChanged();
+        }
         private void ToggleAll_Check()
         {
             var trueFalse = 0;
@@ -262,6 +267,7 @@ namespace Master_View.ViewModels
         {
             ObsPaths = new ObservableCollection<PathInfo>();
             _settings.Paths = new HashSet<PathInfo>();
+            RaiseCanExecuteEvents();
         }
 
         private bool ClearPaths_CanExecute(string filler)
@@ -272,6 +278,7 @@ namespace Master_View.ViewModels
         private void LoadSettings_Execute(string filler)
         {
             SetupControllers(true);
+            RaiseCanExecuteEvents();
         }
         private bool ResetDefaults_CanExecute(string filler)
         {
@@ -283,6 +290,7 @@ namespace Master_View.ViewModels
             ObsPaths = new ObservableCollection<PathInfo>();
             Settings = _defaultSettings;
             UpdateValues();
+            RaiseCanExecuteEvents();
         }
 
         private void SaveSettings_Execute(string filler)
