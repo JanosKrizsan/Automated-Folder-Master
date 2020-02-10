@@ -26,7 +26,7 @@ namespace Master_View.Services
                 .Append("\n\n")
                 .Append(_usageGuideFifth);
 
-            ErrorHandlingService.PopupHandler.Popup(concatenated.ToString(), "Usage Guide", MessageBoxButton.OK, MessageBoxImage.Information);
+            ErrorHandlingService.PopupHandler.ErrorPopup(concatenated.ToString(), "Usage Guide", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
