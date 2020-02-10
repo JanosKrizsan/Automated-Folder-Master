@@ -10,12 +10,51 @@
         <vm:SettingsViewModel/>
     </Window.DataContext>
     <Window.Resources>
+        <Style x:Key="BackButtonStlye" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="Background" Value="#ffd633"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="10" Background="LightBlue" BorderBrush="Black" BorderThickness="0,2,2,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="AddButtonStlye" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#E59400"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="5,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="10" Background="Orange" BorderBrush="Black" BorderThickness="0,2,2,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="HyperlinkStyle" TargetType="{x:Type Hyperlink}">
             <Setter Property="FontStyle" Value="Italic"/>
             <Setter Property="TextDecorations" Value="{x:Null}"/>
             <Setter Property="Foreground" Value="Black"/>
         </Style>
-        <Style TargetType="{x:Type Button}">
+        <Style x:Key="GenericButtonStlye" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="4, 8"/>
             <Setter Property="Height" Value="30"/>
             <Setter Property="Width" Value="90" />
@@ -31,11 +70,14 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="{x:Type ComboBox}">
+        <Style x:Key="ComboBoxStlye" TargetType="{x:Type ComboBox}">
             <Setter Property="Height" Value="20"/>
             <Setter Property="Width" Value="80"/>
             <Setter Property="ItemsSource" Value="{Binding LifeSpans}"/>
             <Setter Property="SelectedItem" Value="{Binding SelectedLifeSpan}"/>
+            <Setter Property="Foreground" Value="DarkCyan"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="DemiBold"/>
         </Style>
         <Style TargetType="{x:Type WrapPanel}">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -45,8 +87,9 @@
         </Style>
         <Style TargetType="{x:Type CheckBox}">
             <Setter Property="Margin" Value="20, 5"/>
+            <Setter Property="BorderBrush" Value="LightCoral"/>
+            <Setter Property="FontWeight" Value="Light"/>
         </Style>
-        
         <Style TargetType="{x:Type ColumnDefinition}">
             <Setter Property="Width" Value="300"/>
         </Style>
@@ -90,16 +133,15 @@
             </StackPanel>
             <StackPanel>
                 <WrapPanel>
-                    <Button Command="{Binding SaveSettingsCommand}" Content="Save Settings"/>
-                    <Button Command="{Binding ResetDefaultsCommand}" Content="Reset Defaults"/>
-                    <Button Command="{Binding ClearPathsCommand}" Content="Clear Paths"/>
-                    <Button Command="{Binding LoadSettingsCommand}" Content="Load Settings"/>
-                    <Button Command="{Binding UsageGuideCommand}" Content="Usage Guide"/>
+                    <Button Command="{Binding SaveSettingsCommand}" Content="Save Settings" Style="{StaticResource GenericButtonStlye}"/>
+                    <Button Command="{Binding ResetDefaultsCommand}" Content="Reset Defaults" Style="{StaticResource GenericButtonStlye}"/>
+                    <Button Command="{Binding ClearPathsCommand}" Content="Clear Paths" Style="{StaticResource GenericButtonStlye}"/>
+                    <Button Command="{Binding LoadSettingsCommand}" Content="Load Settings" Style="{StaticResource GenericButtonStlye}"/>
+                    <Button Command="{Binding UsageGuideCommand}" Content="Usage Guide" Style="{StaticResource GenericButtonStlye}"/>
                 </WrapPanel>
                 <WrapPanel Margin="30">
                     <Label Content="Delete after this many days :"/>
-                    <ComboBox>
-                    </ComboBox>
+                    <ComboBox Style="{StaticResource ComboBoxStlye}"/>
                 </WrapPanel>
             </StackPanel>
         </StackPanel>
@@ -123,60 +165,14 @@
 
         <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Top">
             <Label Content="Add folders to the selected list:"/>
-            <Button x:Name="Back" Content="Back" Command="{Binding FolderMoveBackCommand}" HorizontalAlignment="Left">
-                <Button.Style>
-                    <Style TargetType="{x:Type Button}">
-                        <Setter Property="Height" Value="30"/>
-                        <Setter Property="Width" Value="40"/>
-                        <Setter Property="HorizontalAlignment" Value="Left"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        <Setter Property="VerticalAlignment" Value="Center"/>
-                        <Setter Property="Margin" Value="0,5"/>
-                        <Setter Property="Background" Value="#ffd633"/>
-                        <Setter Property="FontWeight" Value="Bold"/>
-                        <Setter Property="FontSize" Value="12"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border CornerRadius="10" Background="LightBlue" BorderBrush="Black" BorderThickness="0,2,2,0" >
-                                        <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Button.Style>
-            </Button>
+            <Button x:Name="Back" Content="Back" Command="{Binding FolderMoveBackCommand}" HorizontalAlignment="Left" Style="{StaticResource BackButtonStlye}"/>
             <ListBox ItemsSource="{Binding PathsCurrentlyViewed}" HorizontalAlignment="Left" MaxHeight="280">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="+" Command="{Binding Path=DataContext.AddCurrentPathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type StackPanel}}}">
-                                <Button.Style>
-                                    <Style TargetType="{x:Type Button}">
-                                        <Setter Property="Background" Value="#E59400"/>
-                                        <Setter Property="Height" Value="20"/>
-                                        <Setter Property="Width" Value="20"/>
-                                        <Setter Property="HorizontalAlignment" Value="Left"/>
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                        <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="Margin" Value="5,0"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border CornerRadius="10" Background="Orange" BorderBrush="Black" BorderThickness="0,2,2,0" >
-                                                        <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
+                            <Button Content="+" Command="{Binding Path=DataContext.AddCurrentPathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type StackPanel}}}" Style="{StaticResource AddButtonStlye}"/>
                             <TextBlock>
-                            <Hyperlink Command="{Binding DataContext.OpenPathCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
-
+                            <Hyperlink Command="{Binding DataContext.OpenPathCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Style="{StaticResource HyperlinkStyle}">
                                 <Hyperlink.Inlines>
                                     <Run Text="{Binding Path=Name}"/>
                                 </Hyperlink.Inlines>
