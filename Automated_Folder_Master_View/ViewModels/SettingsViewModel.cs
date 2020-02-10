@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
@@ -146,7 +147,7 @@ namespace Master_View.ViewModels
 
         private void OpenPath_Execute(Hyperlink pathToOpen)
         {
-            var _currentTempFolder = (SimplePath)pathToOpen.DataContext;
+            _currentTempFolder = (SimplePath)pathToOpen.DataContext;
 
             var updatedPathList = new ObservableCollection<SimplePath>();
             var innerFolders = Directory.GetDirectories(_currentTempFolder.FullPath);
@@ -171,18 +172,42 @@ namespace Master_View.ViewModels
 
         private void FolderMoveBack_Execute(string filler)
         {
-            if (_currentTempFolder.FullPath != null)
+            var current = _currentTempFolder.FullPath;
+            if (!string.IsNullOrEmpty(current))
             {
                 var resetFolders = new ObservableCollection<SimplePath>();
+                var parentDir = Directory.GetParent(current);
+                var isDrive = false;
 
-                var rootDir = Directory.GetDirectoryRoot(_currentTempFolder.FullPath);
-
-                foreach(var dir in Directory.GetDirectories(rootDir))
+                if (parentDir != null)
                 {
-                    resetFolders.Add(new SimplePath() { FullPath = dir, Name = Path.GetDirectoryName(dir) });
+                    var drives = DriveInfo.GetDrives().ToList();
+                    foreach (var drive in drives)
+                    {
+                        if (drive.Name.Equals(parentDir.Name))
+                        {
+                            isDrive = true;
+                            break;
+                        }
+                    }
                 }
 
-                PathsCurrentlyViewed = resetFolders;
+                if (parentDir != null && !isDrive)
+                {
+                    var parentSubs = Directory.GetDirectories(parentDir.FullName);
+
+                    foreach (var dir in parentSubs)
+                    {
+                        var dirName = Path.GetFileName(dir);
+                        resetFolders.Add(new SimplePath() { FullPath = dir, Name = dirName });
+                    }
+
+                    PathsCurrentlyViewed = resetFolders;
+                }
+                else
+                {
+                    UpdateDrives();
+                }
             }
         }
 
@@ -269,21 +294,24 @@ namespace Master_View.ViewModels
         {
             _settings = SettingsService.ReadData();
             ObsPaths = new ObservableCollection<PathInfo>();
-            PathsCurrentlyViewed = new ObservableCollection<SimplePath>();
 
             foreach (var folder in Settings.Paths)
             {
                 ObsPaths.Add(folder);
             }
 
+            UpdateDrives();
+            UpdateValues();
+        }
+        private void UpdateDrives()
+        {
+            PathsCurrentlyViewed = new ObservableCollection<SimplePath>();
             var drives = DriveInfo.GetDrives();
 
             foreach (var drive in drives)
             {
-                PathsCurrentlyViewed.Add(new SimplePath() { FullPath = drive.Name, Name = drive.Name});
+                PathsCurrentlyViewed.Add(new SimplePath() { FullPath = drive.Name, Name = drive.Name });
             }
-
-            UpdateValues();
         }
         private void UpdateValues()
         {

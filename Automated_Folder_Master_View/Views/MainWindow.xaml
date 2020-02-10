@@ -36,6 +36,19 @@
         <Style TargetType="{x:Type RowDefinition}">
             <Setter Property="Height" Value="350"/>
         </Style>
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Height" Value="10" />
+                    <Setter Property="MinHeight" Value="10" />
+                </Trigger>
+                <Trigger Property="Orientation" Value="Vertical">
+                    <Setter Property="Width" Value="10" />
+                    <Setter Property="MinWidth" Value="10" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -102,16 +115,17 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <ListBox ItemsSource="{Binding PathsCurrentlyViewed}" HorizontalAlignment="Left">
+            <ListBox ItemsSource="{Binding PathsCurrentlyViewed}" HorizontalAlignment="Left" MaxHeight="300">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="+" Command="{Binding AddCurrentPathCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type StackPanel}}}">
+                            <Button Content="+" Command="{Binding vm.AddCurrentPathCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type StackPanel}}}">
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
                                         <Setter Property="Background" Value="#E59400"/>
                                         <Setter Property="Height" Value="15"/>
                                         <Setter Property="Width" Value="15"/>
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
                                     </Style>
                                 </Button.Style>
                             </Button>
