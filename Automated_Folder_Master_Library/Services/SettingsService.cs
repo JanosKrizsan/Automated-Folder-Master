@@ -82,13 +82,12 @@ namespace Master_Library.Services
         }
         private static string GetExecutingConsoleDirectory()
         {
-            //rework this upon release
             var parentDir = Directory.GetParent(Directory.GetCurrentDirectory());
             var targetDirChildren = Directory.GetDirectories(parentDir.FullName);
 
             foreach (var folder in targetDirChildren)
             {
-                if (folder.Contains("Automated_Folder_Master_Console"))
+                if (folder.Contains("Console"))
                 {
                     return folder;
                 }
