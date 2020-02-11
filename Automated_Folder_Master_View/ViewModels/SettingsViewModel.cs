@@ -165,9 +165,18 @@ namespace Master_View.ViewModels
             var folder = (SimplePath)pathInfo.DataContext;
             var currentPaths = _settings.Paths.ToList();
 
-            var pathToAdd = folder.FullPath.Replace("\\", "");
-            var isExisting = currentPaths.Any(path => path.Path.Replace("\\", "") == pathToAdd);
+            var pathToAdd = ReplaceBackSlash(folder.FullPath);
+            var isExisting = currentPaths.Any(path => ReplaceBackSlash(path.Path) == pathToAdd);
 
+            var folderName = Path.GetFileName(folder.FullPath);
+            var isDrive = GetAllDrives().Any(drive => ReplaceBackSlash(drive).Contains(pathToAdd));
+            var isSpecialFolder = GetAllSpecialFolders().Any(spec => ReplaceBackSlash(spec).Contains(folderName));
+            
+            if (isDrive || isSpecialFolder)
+            {
+                ExceptionHandler(new UnauthorizedAccessException());
+                return;
+            }
             if (!isExisting)
             {
                 var newPath = new PathInfo() { Path = folder.FullPath, LifeSpan = Settings.GlobalLifeSpan };
@@ -305,9 +314,9 @@ namespace Master_View.ViewModels
 
         private void SaveSettings_Execute(string filler)
         {
-            SettingsService.SetData(Settings, SetAllLifeToGlobal);
             try
             {
+                SettingsService.SetData(Settings, SetAllLifeToGlobal);
                 SettingsService.SaveData();
                 PopupHandler.SuccessPopup("Successfully saved your settings.");
                 SetupControllers(true);
@@ -394,10 +403,27 @@ namespace Master_View.ViewModels
             return Path.GetFileName(fullPath);
         }
 
+        private string ReplaceBackSlash(string toEdit)
+        {
+            return toEdit.Replace("\\", "");
+        }
+
         private List<string> GetAllDrives()
         {
             return (from drive in DriveInfo.GetDrives().ToList()
                     select drive.Name).ToList();
+        }
+
+        private List<string> GetAllSpecialFolders()
+        {
+            var specials = new List<string>();
+
+            foreach (Environment.SpecialFolder folder in Enum.GetValues(typeof(Environment.SpecialFolder)))
+            {
+                specials.Add(Environment.GetFolderPath(folder));
+            }
+
+            return specials;
         }
     }
 }

@@ -12,10 +12,16 @@ namespace Master_View.Services
             var button = MessageBoxButton.OK;
             var icon = MessageBoxImage.Exclamation;
 
+
             switch (ex.GetType().ToString())
             {
+                case "System.ArgumentException":
+                    text = "The AutoStart Folder cannot be found, please set up the folders as stated in the guide.";
+                    caption = "AutoStart App Not Found";
+                    icon = MessageBoxImage.Error;
+                    break;
                 case "System.UnauthorizedAccessException":
-                    text = "You do not have the necessary privileges to open this folder!";
+                    text = "You do not have the necessary privileges to open, or add this folder!";
                     caption = "Access Denied";
                     break;
                 case "System.InvalidOperationException":

@@ -96,27 +96,29 @@ namespace Master_Library.Services
         }
         private static string GetExecutingConsoleDirectory()
         {
-            //var current = Directory.GetCurrentDirectory();
-            //var parentDir = Directory.GetParent(current);
-            //var targetDirChildren = Directory.GetDirectories(parentDir.FullName).ToList();
+            var target = "";
+            var current = Directory.GetCurrentDirectory();
+            var parentDir = Directory.GetParent(current);
+            var targetDirChildren = Directory.GetDirectories(parentDir.FullName).ToList();
+                
+            targetDirChildren.ForEach((dir) =>
+            {
+                if (dir.ToLower().Contains("console"))
+                {
+                    target = dir;
+                }
+            });
 
-            //var target = "";
-            //targetDirChildren.ForEach((dir) => {
-            //    if (dir.ToLower().Contains("console"))
-            //    {
-            //        target = dir;
-            //    }
-            //});
+            var files = Directory.GetFiles(target).ToList();
+            files.ForEach((file) =>
+            {
+                if (Path.GetExtension(file).Equals(".exe"))
+                {
+                    target = file;
+                }
+            });
 
-            //var files = Directory.GetFiles(target).ToList();
-            //files.ForEach((file) => {
-            //    if (Path.GetExtension(file).Equals(".exe"))
-            //    {
-            //        target = file;
-            //    }
-            //});
-
-            return @"C:\Codecool\PetProject\AFM\Automated_Folder_Master_App\bin\Debug\netcoreapp3.0\Automated_Folder_Master_Console.exe";
+            return target;
         }
     }
 }

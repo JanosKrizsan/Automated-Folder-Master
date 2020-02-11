@@ -12,21 +12,26 @@ namespace Master_View.Services
         private const string _usageGuideFourth = "Above that, you can select how many days should a file exist for, before being automatically deleted.";
         private const string _usageGuideFifth = "You can toggle the checkboxes in the top left, switching on/off specific deletion-features.";
         private const string _usageGuideSixth = "Except the toggle for using global lifetime, all other settings will be saved and persisted.";
+        private const string _usageGuideSeventh = "Please place the compiled Settings and Console folders within the same directory.";
+
 
         public static void UsageGuidePopup()
         {
+            var newLine = "\n\n";
             var concatenated = new StringBuilder();
             concatenated.Append(_usageGuideMain)
-                .Append("\n\n")
+                .Append(newLine)
                 .Append(_usageGuideSecond)
-                .Append("\n\n")
+                .Append(newLine)
                 .Append(_usageGuideThird)
-                .Append("\n\n")
+                .Append(newLine)
                 .Append(_usageGuideFourth)
-                .Append("\n\n")
+                .Append(newLine)
                 .Append(_usageGuideFifth)
-                .Append("\n\n")
-                .Append(_usageGuideSixth);
+                .Append(newLine)
+                .Append(_usageGuideSixth)
+                .Append(newLine)
+                .Append(_usageGuideSeventh);
 
             Popup(concatenated.ToString(), "Usage Guide", MessageBoxButton.OK, MessageBoxImage.Information);
         }
