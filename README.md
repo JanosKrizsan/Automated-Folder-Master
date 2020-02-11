@@ -71,15 +71,34 @@ Alternatively:
 
 ## Code Example
 
-Creating or opening a registry key:
+Serialization to and fro' XML:
 ```
-  private static RegistryKey OpenKey()
-  {
-      var keyLocation = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-      var setWriteable = true;
+    public static SettingsInfo ReadData()
+    {
+        var serializer = new XmlSerializer(typeof(SettingsInfo));
 
-      return Registry.CurrentUser.CreateSubKey(keyLocation, setWriteable);
-  }
+        using var stream = new FileStream(string.Concat(_saveFilePath, _fileName), FileMode.Open, FileAccess.Read);
+        var reader = new XmlTextReader(stream);
+        return (SettingsInfo)serializer.Deserialize(reader);
+    }
+
+    public static void SaveData()
+    {
+        var serializer = new XmlSerializer(typeof(SettingsInfo));
+
+        using var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName));
+        serializer.Serialize(writer, _currentSettings);
+    }
+```
+
+Getting or creating the registry key:
+```
+    private static RegistryKey OpenKey()
+    {
+        var keyLocation = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+
+        return Registry.CurrentUser.CreateSubKey(keyLocation, true);
+    }
 ```
 
 ## Miscellaneous
