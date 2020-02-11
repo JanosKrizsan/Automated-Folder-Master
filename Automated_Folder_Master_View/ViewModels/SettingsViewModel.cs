@@ -183,6 +183,7 @@ namespace Master_View.ViewModels
                 ObsPaths.Add(newPath);
                 Settings.Paths.Add(newPath);
                 PopupHandler.SuccessPopup($"New path: '{newPath.Path}' successfully added.");
+                RaiseCanExecuteEvents();
             }
             else
             {
@@ -274,12 +275,16 @@ namespace Master_View.ViewModels
             UsageGuidePopup();
         }
 
-        private void ClearPaths_Execute(string filler)
+        private void ClearPaths_Execute(string set)
         {
             ObsPaths = new ObservableCollection<PathInfo>();
             _settings.Paths = new HashSet<PathInfo>();
-            RaiseCanExecuteEvents();
-            PopupHandler.SuccessPopup("All paths have been cleared.");
+
+            if (!(set == "reset"))
+            {
+                RaiseCanExecuteEvents();
+                PopupHandler.SuccessPopup("All paths have been cleared.");
+            }
         }
 
         private bool ClearPaths_CanExecute(string filler)
@@ -304,8 +309,8 @@ namespace Master_View.ViewModels
 
         private void ResetDefaults_Execute(string filler)
         {
-            ObsPaths = new ObservableCollection<PathInfo>();
             Settings = _defaultSettings;
+            ClearPaths_Execute("reset");
             UpdateValues();
             RaiseCanExecuteEvents();
 
