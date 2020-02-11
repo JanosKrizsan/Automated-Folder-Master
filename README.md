@@ -1,6 +1,6 @@
 # Automated Folder Master
 
-![Delete Button](https://imgur.com/XcrFxC3)
+![Delete Button](https://i.imgur.com/XcrFxC3.png)
 
 ## What am I?
 
@@ -43,10 +43,6 @@ It is better to use the View, which sets up the settings file for the Console, a
 
 1. Selection and Addition of folders
 2. Setting specific on/off toggles:
-  * Autostart on login
-  * Cleaning of folders with .exe files
-  * Instead of deletion, send items to the bin
-  * Set all path life-times to the global life-time
 3. Editing specific folder values after addition
 4. Setting global life-time
 5. Setting life-time of currently added folder without another entry
