@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Automated_Folder_Master_Con
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Automated_Folder_Master_Library", "Automated_Folder_Master_Library\Automated_Folder_Master_Library.csproj", "{D6969CDB-9D31-41EE-9E68-8540FE9085C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Automated_Folder_Master_View", "Automated_Folder_Master_View\Automated_Folder_Master_View.csproj", "{DD94B18A-92DF-4B0A-B638-4D7CAA1104AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Automated_Folder_Master_View", "Automated_Folder_Master_View\Automated_Folder_Master_View.csproj", "{DD94B18A-92DF-4B0A-B638-4D7CAA1104AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

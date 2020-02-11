@@ -9,45 +9,47 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace Master_Console
 {
-    public static class RunCleanUp
+    public class RunCleanUp
     {
-        private static SettingsInfo _settings;
-        private static List<PathInfo> _folders;
+        private SettingsInfo _settings;
+        private List<PathInfo> _folders;
+        private IOHandlingService _IOService = new IOHandlingService();
 
-        public static void DoCleanup()
+        public void DoCleanup()
         {
             _folders.ForEach((folder) => DetermineDeletion(folder));
 
             ShutdownErrorService();
         }
 
-        public static void ManualSetup()
+        public void ManualSetup()
         {
-            IOHandlingService.Introduction();
+            _IOService.Introduction();
 
             _settings = new SettingsInfo();
 
-            _settings.AutoStartPath = string.Empty;
             _settings.DeleteExes = true;
             _settings.Paths = new HashSet<PathInfo>();
+            _settings.DeleteFolder = _IOService.YesOrNoInput(IOHandlingService.FolderDelOrNot);
+            _settings.SendToBin = _IOService.YesOrNoInput(IOHandlingService.BinOrNot);
 
-            _settings.SendToBin = IOHandlingService.BinOrNotInput();
-
-            _settings.GlobalLifeSpan = IOHandlingService.LifeSpanInput();
+            _settings.GlobalLifeSpan = _IOService.LifeSpanInput();
 
             var path = new PathInfo
             {
-                Path = IOHandlingService.PathInput(),
+                Path = _IOService.PathInput(),
                 LifeSpan = _settings.GlobalLifeSpan
             };
 
             _settings.Paths.Add(path);
 
-            IOHandlingService.SuccessConfirmer();
+            _folders = _settings.Paths?.ToList();
+
+            _IOService.SuccessConfirmer();
 
         }
 
-        public static void AutomaticSetup()
+        public void AutomaticSetup()
         {
             ReadSettings();
             var folders = ReadFolders();
@@ -62,7 +64,7 @@ namespace Master_Console
             }
         }
 
-        private static void DetermineDeletion(PathInfo folder)
+        private void DetermineDeletion(PathInfo folder)
         {
             var lifeSpan = folder.LifeSpan;
             var directory = folder.Path;
@@ -74,11 +76,12 @@ namespace Master_Console
                 return;
             }
 
+
             var timeToDelFolder = lifeSpan < DateTime.Now.Subtract(folderCreationDate);
 
-            if (timeToDelFolder)
+            if (_settings.DeleteFolder && timeToDelFolder)
             {
-                DeleteDirectory(directory);
+                DeleteDirectory(directory, files);
                 return;
             }
 
@@ -92,7 +95,7 @@ namespace Master_Console
             }
         }
 
-        private static void DeleteFile(string path)
+        private void DeleteFile(string path)
         {
             if (_settings.SendToBin)
             {
@@ -104,7 +107,7 @@ namespace Master_Console
             }
         }
 
-        private static void DeleteDirectory(string path)
+        private void DeleteDirectory(string path, string[] files)
         {
             if (_settings.SendToBin)
             {
@@ -112,29 +115,36 @@ namespace Master_Console
             }
             else
             {
+                for (var i = 0; i < files.Length; i++)
+                {
+                    DeleteFile(files[i]);
+                }
                 Directory.Delete(path);
             }
         }
 
-        private static List<PathInfo> ReadFolders()
+        private List<PathInfo> ReadFolders()
         {
             return _settings.Paths?.ToList();
         }
 
-        private static void ReadSettings()
+        private void ReadSettings()
         {
-            dynamic info = SettingsService.ReadData();
+            var info = new SettingsInfo();
 
-            if (info is Exception)
+            try
             {
-                ErrorHandlingService.ExceptionHandler(info);
-                return;
+                info = SettingsService.ReadData();
             }
-            
+            catch(Exception e)
+            {
+                ErrorHandlingService.ExceptionHandler(e);
+            }
+
             _settings = info;
         }
 
-        private static void ShutdownErrorService()
+        private void ShutdownErrorService()
         {
             ErrorHandlingService.Shutdown();
         }

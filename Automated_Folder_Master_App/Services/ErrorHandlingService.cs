@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -22,7 +21,7 @@ namespace Master_Console.Services
                     break;
                 case "System.IO.InvalidDataException":
                     errorMessage = "There are no directories selected, please provide them via the settings app.";
-                    level = LogLevel.Error;
+                    level = LogLevel.Warn;
                     break;
                 case "System.IO.PathTooLongException":
                     errorMessage = "The path provided is too long, or invalid.";
@@ -59,7 +58,7 @@ namespace Master_Console.Services
             LoggingManager.ShutdownLogger();
         }
 
-        private static class LoggingManager
+        internal static class LoggingManager
         {
             private static LoggingConfiguration _config = new LoggingConfiguration();
             private static readonly Logger _logger = LogManager.GetCurrentClassLogger();

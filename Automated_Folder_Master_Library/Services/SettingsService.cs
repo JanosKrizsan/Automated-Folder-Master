@@ -1,7 +1,9 @@
 ﻿using Master_Library.Entities;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -9,102 +11,114 @@ namespace Master_Library.Services
 {
     public static class SettingsService
     {
-        private static RegistryKey _regKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-        private static SettingsInfo _currentSettings = ReadData();
-        private static readonly string _fileName = "/settings.xml";
-        private static readonly string _appName = "Automated_Folder_Master_Console";
-        private static readonly string _appPath = CurrentSettings.AutoStartPath;
+        
+        private static SettingsInfo _currentSettings;
+        private static readonly string _saveFilePath = @"C:\Users\Public\Documents\";
+        private static readonly string _fileName = "settings.xml";
+        private static readonly string _appName = "Automated Folder Master Console";
+        private static string _appPath;
 
-        public static SettingsInfo CurrentSettings
+        public static SettingsInfo Default { get; } = new SettingsInfo()
         {
-            get => _currentSettings;
-            set => _currentSettings = value;
-        }
-
-        public static TimeSpan LifeSpan { get; set; } = CurrentSettings.GlobalLifeSpan;
-
-        public static bool DeleteExes { get; set; } = CurrentSettings.DeleteExes;
+            Autostart = true,
+            DeleteExes = true,
+            DeleteFolder = false,
+            SendToBin = false,
+            GlobalLifeSpan = TimeSpan.FromDays(30),
+            Paths = new HashSet<PathInfo>()
+        };
 
         public static void AddToStartup()
         {
-            _regKey.SetValue(_appName, _appPath);
+            _appPath = GetExecutingConsoleDirectory();
+            var key = OpenKey();
+            key.SetValue(_appName, _appPath);
+            key.Dispose();
         }
 
         public static void RemoveFromStartup()
         {
-            _regKey.DeleteValue(_appName, false);
-        }
-
-        public static dynamic AddPath(string path, TimeSpan lifespan) 
-        {
-            var newPath = new PathInfo
-            {
-                LifeSpan = lifespan,
-                Path = path
-            };
-
-            var contained = CurrentSettings.Paths.Add(newPath);
-
-            if (contained)
-            {
-                return new InvalidOperationException();
-            }
-            return true;
+            var key = OpenKey();
+            key.SetValue(_appName, false);
+            key.Dispose();
         }
 
         public static void SetGlobalLifeTime()
         {
-            foreach (var path in CurrentSettings.Paths)
-            {
-                var info = new PathInfo();
-                var found = CurrentSettings.Paths.TryGetValue(path, out info);
+            _currentSettings.UpdateLifeSpans();
+        }
 
-                if (found)
-                {
-                    info.LifeSpan = LifeSpan;
-                }
+        public static void SetData(SettingsInfo info, bool SetGlobal)
+        {
+            _currentSettings = info;
+            switch (info.Autostart)
+            {
+                case true:
+                    AddToStartup();
+                    break;
+                case false:
+                    RemoveFromStartup();
+                    break;
+            }
+
+            if (SetGlobal)
+            {
+                SetGlobalLifeTime();
             }
         }
 
-        public static void SetSettings(SettingsInfo newInfo)
-        {
-            _currentSettings = newInfo;
-        }
-
-        public static dynamic ReadData()
+        public static SettingsInfo ReadData()
         {
             var serializer = new XmlSerializer(typeof(SettingsInfo));
-            dynamic settings = new SettingsInfo();
-            try
-            {
-                using var stream = new FileStream(_appPath + _fileName, FileMode.Open, FileAccess.Read);
-                var reader = new XmlTextReader(stream);
-                settings = (SettingsInfo)serializer.Deserialize(reader);
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
+            var settings = new SettingsInfo();
+
+            using var stream = new FileStream(string.Concat(_saveFilePath, _fileName), FileMode.Open, FileAccess.Read);
+            var reader = new XmlTextReader(stream);
+            settings = (SettingsInfo)serializer.Deserialize(reader);
+
             return settings;
         }
 
-        public static dynamic SaveData(SettingsInfo info)
+        public static void SaveData()
         {
-            SetSettings(info);
-            var infoToSave = CurrentSettings;
-
             var serializer = new XmlSerializer(typeof(SettingsInfo));
-            try
+
+            using var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName));
+            serializer.Serialize(writer, _currentSettings);
+        }
+
+        private static RegistryKey OpenKey()
+        {
+            var keyLocation = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+            var setWriteable = true;
+
+            return Registry.CurrentUser.CreateSubKey(keyLocation, setWriteable);
+        }
+        private static string GetExecutingConsoleDirectory()
+        {
+            var target = "";
+            var current = Directory.GetCurrentDirectory();
+            var parentDir = Directory.GetParent(current);
+            var targetDirChildren = Directory.GetDirectories(parentDir.FullName).ToList();
+                
+            targetDirChildren.ForEach((dir) =>
             {
-                using var stream = new FileStream(_appPath + _fileName, FileMode.Open, FileAccess.Write);
-                var writer = new StreamWriter(_appPath + _fileName);
-                serializer.Serialize(writer, infoToSave);
-            }
-            catch(IOException e)
+                if (dir.ToLower().Contains("console"))
+                {
+                    target = dir;
+                }
+            });
+
+            var files = Directory.GetFiles(target).ToList();
+            files.ForEach((file) =>
             {
-                return e;
-            }
-            return true;
+                if (Path.GetExtension(file).Equals(".exe"))
+                {
+                    target = file;
+                }
+            });
+
+            return target;
         }
     }
 }

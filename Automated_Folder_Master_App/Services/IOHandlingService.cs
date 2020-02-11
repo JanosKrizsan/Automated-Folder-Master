@@ -5,31 +5,34 @@ using static System.Console;
 
 namespace Master_Console.Services
 {
-    public static class IOHandlingService
+    public class IOHandlingService
     {
-        public static void Introduction()
+        public const string BinOrNot = "Shall the items be put into the bin instead of final deletion? Please type 'yes' or 'no'.";
+        public const string FolderDelOrNot = "Please advise, shall we delete the folder itself too, or just the contents? Please type 'yes or 'no'.";
+        private const string _quitString = "quit";
+        public void Introduction()
         {
             ForegroundColor = ConsoleColor.Green;
             WriteLine("Welcome to Deletor, I am your Deletor (I know I know). We will be deleting your disgusting files manually. Please follow the instructions below.");
             WriteLine("Remember, all your files will be deleted, even application related ones. On success, you should hear a beep. Press any key to continue.");
-            
-            ForegroundColor = ConsoleColor.Yellow;
+
+            ForegroundColor = ConsoleColor.Red;
             WriteLine("To exit, type 'quit'");
             
+            ResetColor();
             ReadKey();
             Clear();
 
-            ResetColor();
             Beep();
         }
-        public static string PathInput()
+        public string PathInput()
         {
-            WriteLine("Please provide the full path to the folder with your garbage files. You can just copy-paste it from WinExplorer.");
+            ColoredQuestion("Please provide the full path to the folder with your garbage files. You can just copy-paste it from WinExplorer.");
             var input = ReadLine();
 
-            if (input == "quit")
+            if (input.Equals(_quitString))
             {
-                Environment.Exit(0);
+                Quit();
             }
 
             try
@@ -45,9 +48,9 @@ namespace Master_Console.Services
             return PathInput();
         }
 
-        public static bool BinOrNotInput()
+        public bool YesOrNoInput(string question)
         {
-            WriteLine("Shall the items be put into the bin instead of final deletion? Please type 'yes' or 'no'.");
+            ColoredQuestion(question);
             var input = ReadLine();
             if (input.Equals("yes"))
             {
@@ -59,19 +62,23 @@ namespace Master_Console.Services
                 Beep();
                 return false;
             }
+            else if (input.Equals(_quitString))
+            {
+                Quit();
+            }
 
-            return BinOrNotInput();
+            return YesOrNoInput(question);
         }
 
-        public static TimeSpan LifeSpanInput()
+        public TimeSpan LifeSpanInput()
         {
-            WriteLine("Please provide the number of days that should have passed since creation of these files.");
+            ColoredQuestion("Please provide the number of days that should have passed since creation of these files.");
             var input = ReadLine();
             try
             {
-                if (input == "quit")
+                if (input.Equals(_quitString))
                 {
-                    Environment.Exit(0);
+                    Quit();
                 }
 
                 if (input.All(char.IsDigit))
@@ -91,12 +98,24 @@ namespace Master_Console.Services
             }
         }
 
-        public static void SuccessConfirmer()
+        public void SuccessConfirmer()
         {
             Beep();
             Beep();
             Beep();
             Beep();
+        }
+
+        private void ColoredQuestion(string text)
+        {
+            ForegroundColor = ConsoleColor.DarkCyan;
+            WriteLine(text);
+            ResetColor();
+        }
+
+        private void Quit()
+        {
+            Environment.Exit(0);
         }
     }
 }
