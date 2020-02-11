@@ -1,4 +1,6 @@
-# Automated-Folder-Master
+# Automated Folder Master
+
+![Delete Button](https://imgur.com/XcrFxC3)
 
 ## What am I?
 
@@ -71,4 +73,18 @@ Alternatively:
 - The folders 'View' and 'Console' should be in the same parent folder
 - Create a shortcut to the View's executable, and start that
 
-## Code
+## Code Example
+
+Creating or opening a registry key:
+```
+  private static RegistryKey OpenKey()
+  {
+      var keyLocation = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+      var setWriteable = true;
+
+      return Registry.CurrentUser.CreateSubKey(keyLocation, setWriteable);
+  }
+```
+
+## Miscellaneous
+[Img Source](https://www.consumerreports.org/privacy/how-to-delete-online-accounts-you-no-longer-need/)
