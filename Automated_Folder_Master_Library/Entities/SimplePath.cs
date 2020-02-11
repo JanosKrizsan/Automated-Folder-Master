@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Master_Library.Entities
+﻿namespace Master_Library.Entities
 {
     public struct SimplePath
     {

@@ -70,13 +70,10 @@ namespace Master_Library.Services
         public static SettingsInfo ReadData()
         {
             var serializer = new XmlSerializer(typeof(SettingsInfo));
-            var settings = new SettingsInfo();
 
             using var stream = new FileStream(string.Concat(_saveFilePath, _fileName), FileMode.Open, FileAccess.Read);
             var reader = new XmlTextReader(stream);
-            settings = (SettingsInfo)serializer.Deserialize(reader);
-
-            return settings;
+            return (SettingsInfo)serializer.Deserialize(reader);
         }
 
         public static void SaveData()
@@ -90,9 +87,8 @@ namespace Master_Library.Services
         private static RegistryKey OpenKey()
         {
             var keyLocation = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-            var setWriteable = true;
 
-            return Registry.CurrentUser.CreateSubKey(keyLocation, setWriteable);
+            return Registry.CurrentUser.CreateSubKey(keyLocation, true);
         }
         private static string GetExecutingConsoleDirectory()
         {
