@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -10,12 +11,12 @@ namespace Master_Library.Services
 {
     public static class SettingsService
     {
-        private static RegistryKey _regKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+        
         private static SettingsInfo _currentSettings;
         private static readonly string _saveFilePath = @"C:\Users\Public\Documents\";
         private static readonly string _fileName = "settings.xml";
-        private static readonly string _appName = "Automated_Folder_Master_Console";
-        private static readonly string _appPath = GetExecutingConsoleDirectory();
+        private static readonly string _appName = "Automated Folder Master Console";
+        private static string _appPath;
 
         public static SettingsInfo Default { get; } = new SettingsInfo()
         {
@@ -29,12 +30,17 @@ namespace Master_Library.Services
 
         public static void AddToStartup()
         {
-            _regKey.SetValue(_appName, _appPath);
+            _appPath = GetExecutingConsoleDirectory();
+            var key = OpenKey();
+            key.SetValue(_appName, _appPath);
+            key.Dispose();
         }
 
         public static void RemoveFromStartup()
         {
-            _regKey.DeleteValue(_appName, false);
+            var key = OpenKey();
+            key.SetValue(_appName, false);
+            key.Dispose();
         }
 
         public static void SetGlobalLifeTime()
@@ -80,19 +86,37 @@ namespace Master_Library.Services
             using var writer = new StreamWriter(string.Concat(_saveFilePath, _fileName));
             serializer.Serialize(writer, _currentSettings);
         }
+
+        private static RegistryKey OpenKey()
+        {
+            var keyLocation = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+            var setWriteable = true;
+
+            return Registry.CurrentUser.CreateSubKey(keyLocation, setWriteable);
+        }
         private static string GetExecutingConsoleDirectory()
         {
-            var parentDir = Directory.GetParent(Directory.GetCurrentDirectory());
-            var targetDirChildren = Directory.GetDirectories(parentDir.FullName);
+            //var current = Directory.GetCurrentDirectory();
+            //var parentDir = Directory.GetParent(current);
+            //var targetDirChildren = Directory.GetDirectories(parentDir.FullName).ToList();
 
-            foreach (var folder in targetDirChildren)
-            {
-                if (folder.Contains("Console"))
-                {
-                    return folder;
-                }
-            }
-            return string.Empty;
+            //var target = "";
+            //targetDirChildren.ForEach((dir) => {
+            //    if (dir.ToLower().Contains("console"))
+            //    {
+            //        target = dir;
+            //    }
+            //});
+
+            //var files = Directory.GetFiles(target).ToList();
+            //files.ForEach((file) => {
+            //    if (Path.GetExtension(file).Equals(".exe"))
+            //    {
+            //        target = file;
+            //    }
+            //});
+
+            return @"C:\Codecool\PetProject\AFM\Automated_Folder_Master_App\bin\Debug\netcoreapp3.0\Automated_Folder_Master_Console.exe";
         }
     }
 }
